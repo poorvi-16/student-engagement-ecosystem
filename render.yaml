@@ -1,0 +1,38 @@
+# Render Blueprint: backend API (FastAPI, Docker). Frontend is deployed on Vercel.
+# Secrets use `sync: false` so Render prompts for them on first deploy; they are never stored in git.
+services:
+  - type: web
+    name: pathpilot-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    region: singapore        # closest Render region to the Supabase project (ap-northeast-2) and India
+    plan: free
+    numInstances: 1          # APScheduler jobs + migrations on start assume a single instance
+    healthCheckPath: /health
+    autoDeploy: true         # every push to main redeploys
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: FRONTEND_ORIGIN
+        sync: false          # e.g. https://student-engagement-ecosystem.vercel.app
+      - key: FRONTEND_ORIGIN_REGEX
+        sync: false          # e.g. https://student-engagement-ecosystem-.*\.vercel\.app (preview deploys)
+      - key: DATABASE_URL
+        sync: false          # Supabase Session pooler URL
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: DAILY_LLM_LIMIT
+        value: "50"
+      - key: MONTHLY_LLM_BUDGET
+        value: "20"

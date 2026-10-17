@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     # Comma-separated list of allowed frontend origins (CORS)
     frontend_origin: str = "http://localhost:3000"
+    # Optional regex for extra origins, e.g. Vercel preview deploys: https://student-engagement-ecosystem-.*\.vercel\.app
+    frontend_origin_regex: str = ""
 
     database_url: str = "sqlite:///./local.db"
 

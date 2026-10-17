@@ -85,9 +85,9 @@ Deploy early and continuously. The skeleton goes live on Day 1, and every push t
 
 1. **GitHub**: push the repo with `.env*` in `.gitignore`. Provide `backend/.env.example` and `frontend/.env.example`.
 2. **Supabase**: create the project, enable the `vector` extension, enable Email (magic link) + Google auth, and create a private `loan-docs` bucket. Run `alembic upgrade head` against the Supabase `DATABASE_URL`.
-3. **Backend on Render**: Web Service from `backend/Dockerfile`, start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, health check `/health`, all backend env vars set in the dashboard, **1 instance only** (because of APScheduler). Commit trained `.pkl` models so the container doesn't need to train.
+3. **Backend on Render**: deployed from `render.yaml` (Blueprint) → Docker service `pathpilot-api`, root `backend/`, region Singapore, free plan, **1 instance**, health check `/health`, auto-deploy on push. `backend/start.sh` runs `alembic upgrade head` before starting uvicorn, so migrations apply on every deploy. Secrets are `sync: false` and entered in the Render dashboard. Commit trained `.pkl` models so the container doesn't need to train.
 4. **Frontend on Vercel**: import the repo with root `frontend/`, and set the `NEXT_PUBLIC_*` vars, with `NEXT_PUBLIC_API_URL` pointing to the Render URL.
-5. **Wire up**: set the backend `FRONTEND_ORIGIN` to the Vercel URL (CORS), and add the Vercel URL to Supabase Auth redirect URLs.
+5. **Wire up**: set the backend `FRONTEND_ORIGIN` to the Vercel production URL and `FRONTEND_ORIGIN_REGEX` to match preview URLs (CORS); add the Vercel URL to Supabase Auth → URL Configuration (Site URL + Redirect URLs).
 6. **Auth emails**: Supabase's built-in mailer allows only ~2–3 emails/hour. Before sharing, either keep "Confirm email" OFF (password sign-up works instantly) or configure custom SMTP (Resend free tier) in Auth → Emails → SMTP. Add the production URL to Auth → URL Configuration.
 7. **Pre-share checklist**:
    - rate limits and the budget kill-switch are on;
