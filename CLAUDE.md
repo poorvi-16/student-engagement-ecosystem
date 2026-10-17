@@ -25,7 +25,7 @@ Timeline: **4 days**, solo developer. Keep every module, but build each one lean
 uvicorn app.main:app --reload
 alembic upgrade head            # uses DATABASE_URL from backend/.env
 alembic revision --autogenerate -m "msg"   # after changing app/db/models.py; review the generated file
-python -m app.db.seed           # load universities/courses/salaries/loan products + KB embeddings
+python data/generate_catalog.py # regenerate universities.csv / courses.csv / catalog_meta.json (indicative data)
 python -m app.ml.train          # regenerate synthetic data + retrain models
 pytest                          # all tests
 pytest tests/test_loan_rules.py::test_emi -q   # single test
@@ -39,6 +39,10 @@ Env vars: `ANTHROPIC_API_KEY`, `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KE
 
 ## Architecture
 Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, `ml/`, `rules/`, `rag/`, `mocks/`, `db/`. Seed data and the RAG knowledge base live in `backend/data/`.
+
+**Reference data vs user data.** Universities, courses, salaries, FX and loan products are static CSV/JSON in `backend/data/`, loaded once into memory by `app/catalog.py:get_catalog()` (amounts in local currency; convert with `catalog.to_inr`). Only per-user data lives in Postgres. Loan products and lenders are fictional.
+
+**Events + XP.** Record user actions with `app/events.py:log_event(session, user, type, payload, xp=, once=)`; it also awards XP (once=True → first occurrence only).
 
 **Profile → everything.** The onboarding quiz creates a `StudentProfile`. Navigator, admit predictor, ROI, timeline, mentor, and the loan estimator all read it, and the loan application form pre-fills from it. Keep the profile the single source of truth.
 
@@ -66,7 +70,7 @@ Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, 
 Deploy early and continuously. The skeleton goes live on Day 1, and every push to `main` auto-deploys.
 
 1. **GitHub**: push the repo with `.env*` in `.gitignore`. Provide `backend/.env.example` and `frontend/.env.example`.
-2. **Supabase**: create the project, enable the `vector` extension, enable Email (magic link) + Google auth, and create a private `loan-docs` bucket. Run `alembic upgrade head` and `python -m app.db.seed` against the Supabase `DATABASE_URL`.
+2. **Supabase**: create the project, enable the `vector` extension, enable Email (magic link) + Google auth, and create a private `loan-docs` bucket. Run `alembic upgrade head` against the Supabase `DATABASE_URL`.
 3. **Backend on Render**: Web Service from `backend/Dockerfile`, start command `uvicorn app.main:app --host 0.0.0.0 --port $PORT`, health check `/health`, all backend env vars set in the dashboard, **1 instance only** (because of APScheduler). Commit trained `.pkl` models so the container doesn't need to train.
 4. **Frontend on Vercel**: import the repo with root `frontend/`, and set the `NEXT_PUBLIC_*` vars, with `NEXT_PUBLIC_API_URL` pointing to the Render URL.
 5. **Wire up**: set the backend `FRONTEND_ORIGIN` to the Vercel URL (CORS), and add the Vercel URL to Supabase Auth redirect URLs.
@@ -82,7 +86,7 @@ Deploy early and continuously. The skeleton goes live on Day 1, and every push t
 Free-tier note: the Render free instance sleeps when idle, so the first request takes about 30–60s. Hit `/health` before a demo.
 
 ## Build schedule (4 days)
-- [ ] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ⬜ 1.3 quiz + seed data · ⬜ 1.4 deploy · ⬜ 1.5 Claude wrapper + navigator)
+- [ ] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ⬜ 1.4 deploy · ⬜ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
 - [ ] **Day 2 – AI modules**: RAG ingest + mentor chat (streaming, tools, citations), synthetic data + admit model with what-if sliders, ROI calculator, timeline generator, SOP reviewer + visa mock interview (single prompt flows).
 - [ ] **Day 3 – Loan funnel + growth**: eligibility rules, dynamic offers, EMI/moratorium planner, loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker. Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.

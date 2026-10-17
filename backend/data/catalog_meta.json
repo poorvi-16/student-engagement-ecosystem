@@ -1,0 +1,56 @@
+{
+  "fx_inr": {
+    "USD": 88.0,
+    "GBP": 115.0,
+    "CAD": 64.0,
+    "EUR": 100.0,
+    "AUD": 58.0,
+    "INR": 1.0
+  },
+  "countries": {
+    "USA": {
+      "currency": "USD",
+      "living_per_year_local": 20000
+    },
+    "UK": {
+      "currency": "GBP",
+      "living_per_year_local": 15000
+    },
+    "Canada": {
+      "currency": "CAD",
+      "living_per_year_local": 20000
+    },
+    "Germany": {
+      "currency": "EUR",
+      "living_per_year_local": 12000
+    },
+    "Ireland": {
+      "currency": "EUR",
+      "living_per_year_local": 15000
+    },
+    "Australia": {
+      "currency": "AUD",
+      "living_per_year_local": 28000
+    },
+    "Netherlands": {
+      "currency": "EUR",
+      "living_per_year_local": 14000
+    },
+    "India": {
+      "currency": "INR",
+      "living_per_year_local": 150000
+    }
+  },
+  "fields": {
+    "computer_science": "Computer Science",
+    "data_science": "Data Science",
+    "electrical": "Electrical Engineering",
+    "mechanical": "Mechanical Engineering",
+    "mba": "MBA",
+    "finance": "Finance",
+    "business_analytics": "Business Analytics",
+    "public_health": "Public Health",
+    "civil": "Civil Engineering"
+  },
+  "disclaimer": "Indicative estimates for a prototype. Verify fees, deadlines and salaries on official sources."
+}

@@ -1,0 +1,73 @@
+{
+  "disclaimer": "All lenders below are fictional. Rates, limits and policies are simulated for this prototype and are not offers of credit.",
+  "products": [
+    {
+      "id": "vidya-secured",
+      "lender": "Vidya Capital (simulated NBFC)",
+      "name": "Vidya Secured Study Loan",
+      "type": "secured",
+      "min_amount_lakhs": 10,
+      "max_amount_lakhs": 150,
+      "rate_range_pct": [9.5, 11.0],
+      "processing_fee_pct": 1.0,
+      "max_tenure_years": 15,
+      "moratorium": "course duration + 12 months",
+      "collateral_cover_pct": 100,
+      "min_co_applicant_income_lpa": 3,
+      "eligible_tiers": [1, 2, 3],
+      "countries": ["USA", "UK", "Canada", "Germany", "Ireland", "Australia", "Netherlands", "India"],
+      "margin_money_pct": 10
+    },
+    {
+      "id": "aarohan-unsecured-premier",
+      "lender": "Aarohan Finance (simulated NBFC)",
+      "name": "Aarohan Premier — No Collateral",
+      "type": "unsecured",
+      "min_amount_lakhs": 5,
+      "max_amount_lakhs": 75,
+      "rate_range_pct": [10.75, 12.5],
+      "processing_fee_pct": 1.25,
+      "max_tenure_years": 12,
+      "moratorium": "course duration + 6 months",
+      "collateral_cover_pct": 0,
+      "min_co_applicant_income_lpa": 6,
+      "eligible_tiers": [1, 2],
+      "countries": ["USA", "UK", "Canada", "Germany", "Ireland", "Australia", "Netherlands"],
+      "margin_money_pct": 0
+    },
+    {
+      "id": "globalscholar-unsecured",
+      "lender": "GlobalScholar Credit (simulated NBFC)",
+      "name": "GlobalScholar Flex",
+      "type": "unsecured",
+      "min_amount_lakhs": 5,
+      "max_amount_lakhs": 40,
+      "rate_range_pct": [12.0, 14.0],
+      "processing_fee_pct": 1.5,
+      "max_tenure_years": 10,
+      "moratorium": "course duration + 6 months",
+      "collateral_cover_pct": 0,
+      "min_co_applicant_income_lpa": 4,
+      "eligible_tiers": [1, 2, 3],
+      "countries": ["USA", "UK", "Canada", "Germany", "Ireland", "Australia", "Netherlands"],
+      "margin_money_pct": 5
+    },
+    {
+      "id": "pragati-domestic",
+      "lender": "Pragati Finance (simulated NBFC)",
+      "name": "Pragati India Higher-Ed Loan",
+      "type": "unsecured",
+      "min_amount_lakhs": 2,
+      "max_amount_lakhs": 40,
+      "rate_range_pct": [10.0, 12.0],
+      "processing_fee_pct": 0.75,
+      "max_tenure_years": 10,
+      "moratorium": "course duration + 12 months",
+      "collateral_cover_pct": 0,
+      "min_co_applicant_income_lpa": 3,
+      "eligible_tiers": [1, 2, 3],
+      "countries": ["India"],
+      "margin_money_pct": 5
+    }
+  ]
+}

@@ -1,32 +1,21 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { useAuth } from "@/components/AuthProvider";
-import { api, type Me } from "@/lib/api";
+import { ProfileStrength } from "@/components/ProfileStrength";
 import { supabase } from "@/lib/supabase";
+import { useMe } from "@/lib/useMe";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { session, loading, authError } = useAuth();
-  const [me, setMe] = useState<Me | null>(null);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (loading) return;
-    if (!session) {
-      router.replace(authError ? `/login?error=${encodeURIComponent(authError)}` : "/login");
-      return;
-    }
-    api<Me>("/me").then(setMe).catch((e) => setError(String(e)));
-  }, [session, loading, authError, router]);
+  const { me, error, loading } = useMe();
 
   async function signOut() {
     await supabase?.auth.signOut();
     router.replace("/");
   }
 
-  if (loading || (!me && !error)) return <main className="p-6 text-gray-500">Loading…</main>;
+  if (loading) return <main className="p-6 text-gray-500">Loading…</main>;
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
@@ -43,29 +32,58 @@ export default function DashboardPage() {
         </p>
       ) : (
         me && (
-          <section className="rounded-xl border border-gray-200 p-5 dark:border-gray-800">
-            <p className="text-lg">
-              Welcome{me.user.full_name ? `, ${me.user.full_name}` : ""} 👋
-            </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400">{me.user.email}</p>
-            <dl className="mt-4 grid grid-cols-3 gap-3 text-center">
-              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-                <dt className="text-xs text-gray-500">XP</dt>
-                <dd className="text-xl font-semibold">{me.user.xp}</dd>
+          <>
+            <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+              <div>
+                <p className="text-lg">Welcome{me.user.full_name ? `, ${me.user.full_name}` : ""} 👋</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400">{me.user.email}</p>
               </div>
-              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-                <dt className="text-xs text-gray-500">Streak</dt>
-                <dd className="text-xl font-semibold">{me.user.streak_days}🔥</dd>
-              </div>
-              <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-900">
-                <dt className="text-xs text-gray-500">Role</dt>
-                <dd className="text-xl font-semibold capitalize">{me.user.role}</dd>
-              </div>
-            </dl>
-            <p className="mt-4 text-sm text-gray-500">
-              {me.profile ? "Profile found." : "No profile yet — the onboarding quiz comes in the next step."}
-            </p>
-          </section>
+              <dl className="flex gap-3 text-center">
+                <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
+                  <dt className="text-xs text-gray-500">XP</dt>
+                  <dd className="text-xl font-semibold">{me.user.xp}</dd>
+                </div>
+                <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
+                  <dt className="text-xs text-gray-500">Streak</dt>
+                  <dd className="text-xl font-semibold">{me.user.streak_days}🔥</dd>
+                </div>
+                {me.user.role === "admin" && (
+                  <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
+                    <dt className="text-xs text-gray-500">Role</dt>
+                    <dd className="text-xl font-semibold">Admin</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+
+            {me.profile && me.strength ? (
+              <section className="space-y-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-semibold">Profile Strength</h2>
+                  <Link href="/onboarding" className="text-sm text-indigo-600 hover:underline">
+                    Edit profile
+                  </Link>
+                </div>
+                <ProfileStrength strength={me.strength} />
+                <p className="text-xs text-gray-500">
+                  Targeting {me.profile.target_countries.join(", ")} · {me.profile.target_intake}
+                </p>
+              </section>
+            ) : (
+              <section className="rounded-xl border-2 border-dashed border-indigo-300 p-6 text-center dark:border-indigo-800">
+                <h2 className="text-lg font-semibold">Find out how strong your profile is</h2>
+                <p className="mx-auto mt-1 max-w-md text-sm text-gray-600 dark:text-gray-400">
+                  A 2-minute quiz unlocks your Profile Strength score, university matches and funding estimates.
+                </p>
+                <Link
+                  href="/onboarding"
+                  className="mt-4 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+                >
+                  Start the quiz · +100 XP
+                </Link>
+              </section>
+            )}
+          </>
         )
       )}
     </main>

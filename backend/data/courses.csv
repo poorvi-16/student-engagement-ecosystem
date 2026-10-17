@@ -1,0 +1,435 @@
+id,university_id,program,field,level,duration_months,tuition_total_local,living_total_local,acceptance_rate,avg_gre,avg_gmat,avg_cgpa,min_ielts,entrance_exam,avg_entrance_percentile,min_work_exp_months,median_salary_local,stem,deadline_month
+1,1,MS Computer Science,computer_science,masters,24,124000.0,50000.0,0.12,324,,8.7,7.0,,,0,131000.0,True,12
+2,1,MS Data Science,data_science,masters,24,124000.0,50000.0,0.07,327,,9.0,7.0,,,0,121000.0,True,12
+3,1,MS Electrical Engineering,electrical,masters,24,124000.0,50000.0,0.07,322,,8.6,7.0,,,0,114000.0,True,12
+4,1,MS Mechanical Engineering,mechanical,masters,24,124000.0,50000.0,0.08,326,,8.7,7.0,,,0,93000.0,True,12
+5,1,MS Civil Engineering,civil,masters,24,124000.0,50000.0,0.12,323,,8.8,7.0,,,0,81000.0,True,12
+6,1,MBA,mba,mba,24,198400.0,50000.0,0.09,,729,8.9,7.0,,,24,167000.0,False,12
+7,1,MS Finance,finance,masters,24,142600.0,50000.0,0.12,323,,8.7,7.0,,,0,108000.0,False,12
+8,1,MS Business Analytics,business_analytics,masters,24,136400.0,50000.0,0.13,325,,8.6,7.0,,,0,99000.0,True,12
+9,2,MS Computer Science,computer_science,masters,24,126000.0,50000.0,0.14,328,,8.6,7.0,,,0,139000.0,True,12
+10,2,MS Data Science,data_science,masters,24,126000.0,50000.0,0.1,325,,8.6,7.0,,,0,122000.0,True,12
+11,2,MS Electrical Engineering,electrical,masters,24,126000.0,50000.0,0.09,328,,8.7,7.0,,,0,116000.0,True,12
+12,2,MS Mechanical Engineering,mechanical,masters,24,126000.0,50000.0,0.08,327,,8.7,7.0,,,0,88000.0,True,12
+13,2,MS Civil Engineering,civil,masters,24,126000.0,50000.0,0.09,323,,8.9,7.0,,,0,77000.0,True,12
+14,2,MBA,mba,mba,24,201600.0,50000.0,0.09,,731,8.7,7.0,,,24,160000.0,False,12
+15,2,Master of Public Health,public_health,masters,24,119700.0,50000.0,0.09,324,,8.9,7.0,,,0,78000.0,False,12
+16,3,MS Computer Science,computer_science,masters,24,116000.0,40000.0,0.12,327,,8.7,7.0,,,0,132000.0,True,12
+17,3,MS Data Science,data_science,masters,24,116000.0,40000.0,0.13,325,,8.7,7.0,,,0,122000.0,True,12
+18,3,MS Electrical Engineering,electrical,masters,24,116000.0,40000.0,0.14,323,,8.9,7.0,,,0,117000.0,True,12
+19,3,MS Mechanical Engineering,mechanical,masters,24,116000.0,40000.0,0.14,323,,8.9,7.0,,,0,95000.0,True,12
+20,3,MS Business Analytics,business_analytics,masters,24,127600.0,40000.0,0.13,322,,8.7,7.0,,,0,102000.0,True,12
+21,3,MBA,mba,mba,24,185600.0,40000.0,0.14,,715,8.7,7.0,,,24,167000.0,False,12
+22,4,MS Computer Science,computer_science,masters,24,90000.0,40000.0,0.1,327,,8.8,7.0,,,0,143000.0,True,12
+23,4,MS Data Science,data_science,masters,24,90000.0,40000.0,0.08,326,,8.8,7.0,,,0,123000.0,True,12
+24,4,MS Electrical Engineering,electrical,masters,24,90000.0,40000.0,0.13,326,,8.8,7.0,,,0,114000.0,True,12
+25,4,MS Mechanical Engineering,mechanical,masters,24,90000.0,40000.0,0.08,326,,8.8,7.0,,,0,97000.0,True,12
+26,4,MS Civil Engineering,civil,masters,24,90000.0,40000.0,0.13,323,,8.9,7.0,,,0,83000.0,True,12
+27,4,MBA,mba,mba,24,144000.0,40000.0,0.13,,707,8.8,7.0,,,24,160000.0,False,12
+28,4,Master of Public Health,public_health,masters,24,85500.0,40000.0,0.11,324,,9.0,7.0,,,0,80000.0,False,12
+29,5,MS Computer Science,computer_science,masters,24,64000.0,40000.0,0.14,327,,8.6,7.0,,,0,131000.0,True,12
+30,5,MS Data Science,data_science,masters,24,64000.0,40000.0,0.14,328,,8.9,7.0,,,0,130000.0,True,12
+31,5,MS Electrical Engineering,electrical,masters,24,64000.0,40000.0,0.07,325,,8.6,7.0,,,0,114000.0,True,12
+32,5,MS Mechanical Engineering,mechanical,masters,24,64000.0,40000.0,0.12,326,,8.9,7.0,,,0,94000.0,True,12
+33,5,MS Civil Engineering,civil,masters,24,64000.0,40000.0,0.11,327,,8.7,7.0,,,0,77000.0,True,12
+34,5,MS Business Analytics,business_analytics,masters,24,70400.0,40000.0,0.12,323,,8.7,7.0,,,0,105000.0,True,12
+35,6,MS Computer Science,computer_science,masters,24,76000.0,40000.0,0.07,326,,9.0,7.0,,,0,144000.0,True,12
+36,6,MS Data Science,data_science,masters,24,76000.0,40000.0,0.11,322,,9.0,7.0,,,0,126000.0,True,12
+37,6,MS Electrical Engineering,electrical,masters,24,76000.0,40000.0,0.14,324,,8.7,7.0,,,0,119000.0,True,12
+38,6,MS Mechanical Engineering,mechanical,masters,24,76000.0,40000.0,0.08,322,,8.6,7.0,,,0,93000.0,True,12
+39,6,MS Civil Engineering,civil,masters,24,76000.0,40000.0,0.1,328,,8.8,7.0,,,0,77000.0,True,12
+40,6,MS Finance,finance,masters,24,87400.0,40000.0,0.07,326,,8.7,7.0,,,0,111000.0,False,12
+41,6,MS Business Analytics,business_analytics,masters,24,83600.0,40000.0,0.11,323,,9.0,7.0,,,0,105000.0,True,12
+42,6,MBA,mba,mba,24,121600.0,40000.0,0.13,,727,8.7,7.0,,,24,164000.0,False,12
+43,7,MS Computer Science,computer_science,masters,24,72000.0,40000.0,0.15,325,,9.0,7.0,,,0,140000.0,True,12
+44,7,MS Data Science,data_science,masters,24,72000.0,40000.0,0.1,322,,8.7,7.0,,,0,123000.0,True,12
+45,7,MS Electrical Engineering,electrical,masters,24,72000.0,40000.0,0.11,323,,8.6,7.0,,,0,112000.0,True,12
+46,7,MS Mechanical Engineering,mechanical,masters,24,72000.0,40000.0,0.12,322,,9.0,7.0,,,0,88000.0,True,12
+47,7,MS Civil Engineering,civil,masters,24,72000.0,40000.0,0.14,323,,8.7,7.0,,,0,77000.0,True,12
+48,7,MBA,mba,mba,24,115200.0,40000.0,0.1,,728,9.0,7.0,,,24,162000.0,False,12
+49,7,MS Business Analytics,business_analytics,masters,24,79200.0,40000.0,0.11,328,,8.8,7.0,,,0,103000.0,True,12
+50,8,MS Computer Science,computer_science,masters,24,108000.0,40000.0,0.1,327,,8.8,7.0,,,0,132000.0,True,12
+51,8,MS Data Science,data_science,masters,24,108000.0,40000.0,0.1,327,,8.6,7.0,,,0,126000.0,True,12
+52,8,MS Electrical Engineering,electrical,masters,24,108000.0,40000.0,0.12,322,,8.8,7.0,,,0,117000.0,True,12
+53,8,MS Mechanical Engineering,mechanical,masters,24,108000.0,40000.0,0.09,323,,8.7,7.0,,,0,95000.0,True,12
+54,8,MS Civil Engineering,civil,masters,24,108000.0,40000.0,0.11,323,,8.7,7.0,,,0,78000.0,True,12
+55,8,MBA,mba,mba,24,172800.0,40000.0,0.08,,719,8.9,7.0,,,24,168000.0,False,12
+56,8,Master of Public Health,public_health,masters,24,102600.0,40000.0,0.14,327,,9.0,7.0,,,0,77000.0,False,12
+57,9,MS Computer Science,computer_science,masters,24,132000.0,50000.0,0.14,328,,8.9,7.0,,,0,144000.0,True,12
+58,9,MS Data Science,data_science,masters,24,132000.0,50000.0,0.07,323,,8.9,7.0,,,0,126000.0,True,12
+59,9,MS Electrical Engineering,electrical,masters,24,132000.0,50000.0,0.14,322,,9.0,7.0,,,0,111000.0,True,12
+60,9,MBA,mba,mba,24,211200.0,50000.0,0.08,,719,8.7,7.0,,,24,166000.0,False,12
+61,9,MS Finance,finance,masters,24,151800.0,50000.0,0.12,328,,8.8,7.0,,,0,112000.0,False,12
+62,9,Master of Public Health,public_health,masters,24,125400.0,50000.0,0.12,324,,8.7,7.0,,,0,78000.0,False,12
+63,10,MS Computer Science,computer_science,masters,24,120000.0,40000.0,0.07,322,,8.9,7.0,,,0,141000.0,True,12
+64,10,MS Electrical Engineering,electrical,masters,24,120000.0,40000.0,0.07,326,,9.0,7.0,,,0,116000.0,True,12
+65,10,MS Mechanical Engineering,mechanical,masters,24,120000.0,40000.0,0.11,326,,8.6,7.0,,,0,88000.0,True,12
+66,10,MS Civil Engineering,civil,masters,24,120000.0,40000.0,0.08,327,,8.9,7.0,,,0,81000.0,True,12
+67,10,MBA,mba,mba,24,192000.0,40000.0,0.1,,723,8.7,7.0,,,24,168000.0,False,12
+68,11,MS Computer Science,computer_science,masters,24,64000.0,40000.0,0.32,315,,8.1,6.5,,,0,121000.0,True,12
+69,11,MS Data Science,data_science,masters,24,64000.0,40000.0,0.31,314,,7.9,6.5,,,0,108000.0,True,12
+70,11,MS Electrical Engineering,electrical,masters,24,64000.0,40000.0,0.34,315,,7.9,6.5,,,0,97000.0,True,12
+71,11,MS Mechanical Engineering,mechanical,masters,24,64000.0,40000.0,0.33,318,,8.2,6.5,,,0,80000.0,True,12
+72,11,Master of Public Health,public_health,masters,24,60800.0,40000.0,0.2,316,,8.2,6.5,,,0,71000.0,False,12
+73,12,MS Computer Science,computer_science,masters,24,68000.0,40000.0,0.21,314,,7.9,6.5,,,0,117000.0,True,12
+74,12,MS Data Science,data_science,masters,24,68000.0,40000.0,0.27,313,,7.9,6.5,,,0,105000.0,True,12
+75,12,MS Electrical Engineering,electrical,masters,24,68000.0,40000.0,0.23,317,,7.9,6.5,,,0,103000.0,True,12
+76,12,MS Mechanical Engineering,mechanical,masters,24,68000.0,40000.0,0.4,316,,7.8,6.5,,,0,82000.0,True,12
+77,12,MS Civil Engineering,civil,masters,24,68000.0,40000.0,0.36,317,,7.8,6.5,,,0,69000.0,True,12
+78,12,Master of Public Health,public_health,masters,24,64600.0,40000.0,0.38,312,,8.1,6.5,,,0,68000.0,False,12
+79,12,MBA,mba,mba,24,108800.0,40000.0,0.23,,651,8.1,6.5,,,12,137000.0,False,12
+80,13,MS Computer Science,computer_science,masters,24,60000.0,40000.0,0.24,314,,8.0,6.5,,,0,122000.0,True,12
+81,13,MS Data Science,data_science,masters,24,60000.0,40000.0,0.25,312,,7.8,6.5,,,0,114000.0,True,12
+82,13,MS Electrical Engineering,electrical,masters,24,60000.0,40000.0,0.28,312,,7.9,6.5,,,0,98000.0,True,12
+83,13,MS Mechanical Engineering,mechanical,masters,24,60000.0,40000.0,0.23,313,,8.1,6.5,,,0,84000.0,True,12
+84,13,MS Civil Engineering,civil,masters,24,60000.0,40000.0,0.31,312,,7.8,6.5,,,0,69000.0,True,12
+85,13,MS Business Analytics,business_analytics,masters,24,66000.0,40000.0,0.39,313,,8.0,6.5,,,0,92000.0,True,12
+86,13,MBA,mba,mba,24,96000.0,40000.0,0.37,,649,8.0,6.5,,,12,141000.0,False,12
+87,14,MS Computer Science,computer_science,masters,24,116000.0,50000.0,0.21,318,,8.2,6.5,,,0,118000.0,True,12
+88,14,MS Data Science,data_science,masters,24,116000.0,50000.0,0.21,317,,7.9,6.5,,,0,108000.0,True,12
+89,14,MS Electrical Engineering,electrical,masters,24,116000.0,50000.0,0.22,318,,8.0,6.5,,,0,103000.0,True,12
+90,14,MS Mechanical Engineering,mechanical,masters,24,116000.0,50000.0,0.32,313,,8.1,6.5,,,0,77000.0,True,12
+91,14,MS Civil Engineering,civil,masters,24,116000.0,50000.0,0.4,315,,7.8,6.5,,,0,72000.0,True,12
+92,14,MS Business Analytics,business_analytics,masters,24,127600.0,50000.0,0.35,315,,8.1,6.5,,,0,88000.0,True,12
+93,14,MBA,mba,mba,24,185600.0,50000.0,0.37,,653,7.9,6.5,,,12,144000.0,False,12
+94,14,Master of Public Health,public_health,masters,24,110200.0,50000.0,0.34,312,,8.1,6.5,,,0,69000.0,False,12
+95,15,MS Computer Science,computer_science,masters,24,110000.0,50000.0,0.24,315,,7.9,6.5,,,0,124000.0,True,12
+96,15,MS Data Science,data_science,masters,24,110000.0,50000.0,0.36,313,,7.8,6.5,,,0,114000.0,True,12
+97,15,MS Electrical Engineering,electrical,masters,24,110000.0,50000.0,0.24,318,,7.8,6.5,,,0,98000.0,True,12
+98,15,MBA,mba,mba,24,176000.0,50000.0,0.35,,661,8.0,6.5,,,12,138000.0,False,12
+99,15,MS Finance,finance,masters,24,126500.0,50000.0,0.4,312,,7.8,6.5,,,0,95000.0,False,12
+100,15,Master of Public Health,public_health,masters,24,104500.0,50000.0,0.39,314,,7.8,6.5,,,0,68000.0,False,12
+101,16,MS Computer Science,computer_science,masters,24,100000.0,40000.0,0.32,318,,7.9,6.5,,,0,118000.0,True,12
+102,16,MS Data Science,data_science,masters,24,100000.0,40000.0,0.32,315,,8.2,6.5,,,0,110000.0,True,12
+103,16,MS Electrical Engineering,electrical,masters,24,100000.0,40000.0,0.24,315,,7.8,6.5,,,0,95000.0,True,12
+104,16,MS Mechanical Engineering,mechanical,masters,24,100000.0,40000.0,0.39,317,,8.2,6.5,,,0,80000.0,True,12
+105,16,MS Business Analytics,business_analytics,masters,24,110000.0,40000.0,0.35,315,,7.8,6.5,,,0,87000.0,True,12
+106,17,MS Computer Science,computer_science,masters,24,56000.0,40000.0,0.33,314,,8.1,6.5,,,0,118000.0,True,12
+107,17,MS Data Science,data_science,masters,24,56000.0,40000.0,0.22,316,,7.9,6.5,,,0,114000.0,True,12
+108,17,MS Electrical Engineering,electrical,masters,24,56000.0,40000.0,0.28,314,,8.0,6.5,,,0,99000.0,True,12
+109,17,MS Mechanical Engineering,mechanical,masters,24,56000.0,40000.0,0.24,315,,8.1,6.5,,,0,81000.0,True,12
+110,17,MS Civil Engineering,civil,masters,24,56000.0,40000.0,0.38,314,,8.0,6.5,,,0,71000.0,True,12
+111,17,MS Business Analytics,business_analytics,masters,24,61600.0,40000.0,0.37,313,,8.0,6.5,,,0,88000.0,True,12
+112,17,MBA,mba,mba,24,89600.0,40000.0,0.32,,659,8.0,6.5,,,12,142000.0,False,12
+113,18,MS Computer Science,computer_science,masters,24,60000.0,40000.0,0.34,318,,8.2,6.5,,,0,120000.0,True,12
+114,18,MS Data Science,data_science,masters,24,60000.0,40000.0,0.36,312,,7.9,6.5,,,0,106000.0,True,12
+115,18,MS Electrical Engineering,electrical,masters,24,60000.0,40000.0,0.33,312,,8.1,6.5,,,0,101000.0,True,12
+116,18,MS Mechanical Engineering,mechanical,masters,24,60000.0,40000.0,0.35,313,,8.1,6.5,,,0,81000.0,True,12
+117,18,MS Civil Engineering,civil,masters,24,60000.0,40000.0,0.23,315,,8.0,6.5,,,0,67000.0,True,12
+118,18,MBA,mba,mba,24,96000.0,40000.0,0.35,,673,8.1,6.5,,,12,139000.0,False,12
+119,19,MS Computer Science,computer_science,masters,24,56000.0,40000.0,0.24,315,,8.0,6.5,,,0,122000.0,True,12
+120,19,MS Data Science,data_science,masters,24,56000.0,40000.0,0.23,318,,8.1,6.5,,,0,112000.0,True,12
+121,19,MS Electrical Engineering,electrical,masters,24,56000.0,40000.0,0.38,313,,7.9,6.5,,,0,103000.0,True,12
+122,19,MS Mechanical Engineering,mechanical,masters,24,56000.0,40000.0,0.39,312,,8.0,6.5,,,0,80000.0,True,12
+123,19,MS Civil Engineering,civil,masters,24,56000.0,40000.0,0.38,313,,8.1,6.5,,,0,67000.0,True,12
+124,19,MBA,mba,mba,24,89600.0,40000.0,0.33,,664,7.9,6.5,,,12,147000.0,False,12
+125,19,Master of Public Health,public_health,masters,24,53200.0,40000.0,0.35,318,,8.1,6.5,,,0,70000.0,False,12
+126,20,MS Computer Science,computer_science,masters,24,64000.0,40000.0,0.3,316,,8.0,6.5,,,0,124000.0,True,12
+127,20,MS Data Science,data_science,masters,24,64000.0,40000.0,0.23,315,,7.9,6.5,,,0,114000.0,True,12
+128,20,MS Electrical Engineering,electrical,masters,24,64000.0,40000.0,0.25,318,,8.1,6.5,,,0,101000.0,True,12
+129,20,MS Mechanical Engineering,mechanical,masters,24,64000.0,40000.0,0.3,315,,7.8,6.5,,,0,78000.0,True,12
+130,20,MS Civil Engineering,civil,masters,24,64000.0,40000.0,0.26,314,,8.2,6.5,,,0,68000.0,True,12
+131,20,MS Business Analytics,business_analytics,masters,24,70400.0,40000.0,0.22,315,,8.1,6.5,,,0,87000.0,True,12
+132,20,MS Finance,finance,masters,24,73600.0,40000.0,0.34,315,,7.9,6.5,,,0,91000.0,False,12
+133,21,MS Computer Science,computer_science,masters,24,60000.0,40000.0,0.57,308,,7.3,6.5,,,0,103000.0,True,12
+134,21,MS Data Science,data_science,masters,24,60000.0,40000.0,0.68,307,,7.1,6.5,,,0,100000.0,True,12
+135,21,MS Electrical Engineering,electrical,masters,24,60000.0,40000.0,0.67,305,,7.1,6.5,,,0,91000.0,True,12
+136,21,MS Mechanical Engineering,mechanical,masters,24,60000.0,40000.0,0.54,308,,7.5,6.5,,,0,74000.0,True,12
+137,21,MS Civil Engineering,civil,masters,24,60000.0,40000.0,0.66,307,,7.3,6.5,,,0,63000.0,True,12
+138,21,MS Business Analytics,business_analytics,masters,24,66000.0,40000.0,0.6,303,,7.2,6.5,,,0,79000.0,True,12
+139,21,MBA,mba,mba,24,96000.0,40000.0,0.57,,606,7.4,6.5,,,12,125000.0,False,12
+140,22,MS Computer Science,computer_science,masters,24,56000.0,40000.0,0.55,305,,7.5,6.5,,,0,104000.0,True,12
+141,22,MS Data Science,data_science,masters,24,56000.0,40000.0,0.7,305,,7.3,6.5,,,0,99000.0,True,12
+142,22,MS Electrical Engineering,electrical,masters,24,56000.0,40000.0,0.62,305,,7.2,6.5,,,0,86000.0,True,12
+143,22,MS Business Analytics,business_analytics,masters,24,61600.0,40000.0,0.57,305,,7.2,6.5,,,0,77000.0,True,12
+144,22,MS Finance,finance,masters,24,64400.0,40000.0,0.56,305,,7.2,6.5,,,0,84000.0,False,12
+145,23,MS Computer Science,computer_science,masters,24,54000.0,40000.0,0.69,308,,7.1,6.5,,,0,107000.0,True,12
+146,23,MS Data Science,data_science,masters,24,54000.0,40000.0,0.45,304,,7.2,6.5,,,0,99000.0,True,12
+147,23,MS Electrical Engineering,electrical,masters,24,54000.0,40000.0,0.47,302,,7.4,6.5,,,0,94000.0,True,12
+148,23,MS Mechanical Engineering,mechanical,masters,24,54000.0,40000.0,0.69,302,,7.3,6.5,,,0,70000.0,True,12
+149,24,MS Computer Science,computer_science,masters,24,60000.0,40000.0,0.51,302,,7.3,6.5,,,0,108000.0,True,12
+150,24,MS Data Science,data_science,masters,24,60000.0,40000.0,0.5,308,,7.2,6.5,,,0,101000.0,True,12
+151,24,MS Electrical Engineering,electrical,masters,24,60000.0,40000.0,0.6,307,,7.1,6.5,,,0,94000.0,True,12
+152,24,MS Mechanical Engineering,mechanical,masters,24,60000.0,40000.0,0.65,302,,7.3,6.5,,,0,75000.0,True,12
+153,24,MS Civil Engineering,civil,masters,24,60000.0,40000.0,0.68,305,,7.3,6.5,,,0,63000.0,True,12
+154,25,MS Computer Science,computer_science,masters,24,54000.0,40000.0,0.63,307,,7.4,6.5,,,0,103000.0,True,12
+155,25,MS Data Science,data_science,masters,24,54000.0,40000.0,0.51,304,,7.4,6.5,,,0,101000.0,True,12
+156,25,MS Electrical Engineering,electrical,masters,24,54000.0,40000.0,0.6,306,,7.4,6.5,,,0,87000.0,True,12
+157,25,MS Mechanical Engineering,mechanical,masters,24,54000.0,40000.0,0.54,304,,7.1,6.5,,,0,71000.0,True,12
+158,25,MS Civil Engineering,civil,masters,24,54000.0,40000.0,0.61,305,,7.4,6.5,,,0,60000.0,True,12
+159,25,MBA,mba,mba,24,86400.0,40000.0,0.48,,605,7.5,6.5,,,12,132000.0,False,12
+160,26,MS Computer Science,computer_science,masters,24,90000.0,40000.0,0.56,303,,7.4,6.5,,,0,104000.0,True,12
+161,26,MS Data Science,data_science,masters,24,90000.0,40000.0,0.69,308,,7.5,6.5,,,0,97000.0,True,12
+162,26,MS Electrical Engineering,electrical,masters,24,90000.0,40000.0,0.64,308,,7.4,6.5,,,0,90000.0,True,12
+163,26,MS Business Analytics,business_analytics,masters,24,99000.0,40000.0,0.52,308,,7.5,6.5,,,0,84000.0,True,12
+164,27,MS Computer Science,computer_science,masters,24,60000.0,40000.0,0.52,308,,7.3,6.5,,,0,107000.0,True,12
+165,27,MS Data Science,data_science,masters,24,60000.0,40000.0,0.6,302,,7.3,6.5,,,0,98000.0,True,12
+166,27,MS Business Analytics,business_analytics,masters,24,66000.0,40000.0,0.53,304,,7.4,6.5,,,0,81000.0,True,12
+167,27,Master of Public Health,public_health,masters,24,57000.0,40000.0,0.54,307,,7.5,6.5,,,0,65000.0,False,12
+168,28,MS Computer Science,computer_science,masters,12,38000.0,15000.0,0.11,323,,8.6,7.0,,,0,58000.0,True,2
+169,28,MBA,mba,mba,12,60800.0,15000.0,0.12,,729,8.7,7.0,,,24,98000.0,False,2
+170,28,MS Finance,finance,masters,12,43700.0,15000.0,0.1,325,,8.9,7.0,,,0,59000.0,False,2
+171,28,Master of Public Health,public_health,masters,12,36100.0,15000.0,0.07,327,,8.7,7.0,,,0,39000.0,False,2
+172,29,MS Computer Science,computer_science,masters,12,40000.0,15000.0,0.12,326,,8.8,7.0,,,0,57000.0,True,2
+173,29,MS Electrical Engineering,electrical,masters,12,40000.0,15000.0,0.1,324,,8.7,7.0,,,0,47000.0,True,2
+174,29,MS Mechanical Engineering,mechanical,masters,12,40000.0,15000.0,0.1,323,,8.6,7.0,,,0,39000.0,True,2
+175,29,MBA,mba,mba,12,64000.0,15000.0,0.08,,722,9.0,7.0,,,24,94000.0,False,2
+176,29,MS Finance,finance,masters,12,46000.0,15000.0,0.12,327,,8.8,7.0,,,0,56000.0,False,2
+177,30,MS Computer Science,computer_science,masters,12,40000.0,18800.0,0.13,326,,8.8,7.0,,,0,60000.0,True,2
+178,30,MS Data Science,data_science,masters,12,40000.0,18800.0,0.15,324,,8.7,7.0,,,0,53000.0,True,2
+179,30,MS Electrical Engineering,electrical,masters,12,40000.0,18800.0,0.08,326,,8.7,7.0,,,0,44000.0,True,2
+180,30,MS Mechanical Engineering,mechanical,masters,12,40000.0,18800.0,0.06,324,,8.9,7.0,,,0,38000.0,True,2
+181,30,MS Civil Engineering,civil,masters,12,40000.0,18800.0,0.07,325,,8.6,7.0,,,0,38000.0,True,2
+182,30,MS Business Analytics,business_analytics,masters,12,44000.0,18800.0,0.06,325,,8.8,7.0,,,0,45000.0,True,2
+183,30,MS Finance,finance,masters,12,46000.0,18800.0,0.08,328,,8.8,7.0,,,0,55000.0,False,2
+184,30,MBA,mba,mba,12,64000.0,18800.0,0.13,,707,8.8,7.0,,,24,97000.0,False,2
+185,30,Master of Public Health,public_health,masters,12,38000.0,18800.0,0.12,328,,8.8,7.0,,,0,39000.0,False,2
+186,31,MS Computer Science,computer_science,masters,12,36000.0,18800.0,0.09,322,,8.8,7.0,,,0,60000.0,True,2
+187,31,MS Data Science,data_science,masters,12,36000.0,18800.0,0.1,326,,8.7,7.0,,,0,52000.0,True,2
+188,31,MS Electrical Engineering,electrical,masters,12,36000.0,18800.0,0.11,325,,8.7,7.0,,,0,46000.0,True,2
+189,31,MS Mechanical Engineering,mechanical,masters,12,36000.0,18800.0,0.11,326,,8.8,7.0,,,0,40000.0,True,2
+190,31,MS Civil Engineering,civil,masters,12,36000.0,18800.0,0.11,328,,8.7,7.0,,,0,38000.0,True,2
+191,31,MS Business Analytics,business_analytics,masters,12,39600.0,18800.0,0.08,323,,8.7,7.0,,,0,47000.0,True,2
+192,31,MS Finance,finance,masters,12,41400.0,18800.0,0.11,325,,8.8,7.0,,,0,56000.0,False,2
+193,31,Master of Public Health,public_health,masters,12,34200.0,18800.0,0.11,323,,8.7,7.0,,,0,39000.0,False,2
+194,32,MS Data Science,data_science,masters,12,34000.0,18800.0,0.09,322,,8.9,7.0,,,0,54000.0,True,2
+195,32,MS Finance,finance,masters,12,39100.0,18800.0,0.14,327,,8.8,7.0,,,0,59000.0,False,2
+196,32,MS Business Analytics,business_analytics,masters,12,37400.0,18800.0,0.13,322,,8.8,7.0,,,0,45000.0,True,2
+197,32,Master of Public Health,public_health,masters,12,32300.0,18800.0,0.12,328,,8.7,7.0,,,0,42000.0,False,2
+198,33,MS Computer Science,computer_science,masters,12,34000.0,15000.0,0.07,326,,8.9,7.0,,,0,59000.0,True,2
+199,33,MS Data Science,data_science,masters,12,34000.0,15000.0,0.11,322,,8.8,7.0,,,0,51000.0,True,2
+200,33,MS Electrical Engineering,electrical,masters,12,34000.0,15000.0,0.09,324,,8.8,7.0,,,0,46000.0,True,2
+201,33,MS Mechanical Engineering,mechanical,masters,12,34000.0,15000.0,0.1,322,,9.0,7.0,,,0,39000.0,True,2
+202,33,MS Civil Engineering,civil,masters,12,34000.0,15000.0,0.13,322,,8.6,7.0,,,0,37000.0,True,2
+203,33,MS Business Analytics,business_analytics,masters,12,37400.0,15000.0,0.15,326,,8.8,7.0,,,0,48000.0,True,2
+204,33,MS Finance,finance,masters,12,39100.0,15000.0,0.06,328,,8.7,7.0,,,0,59000.0,False,2
+205,34,MS Computer Science,computer_science,masters,12,31000.0,15000.0,0.21,315,,8.0,6.5,,,0,51000.0,True,2
+206,34,MS Data Science,data_science,masters,12,31000.0,15000.0,0.29,316,,8.0,6.5,,,0,44000.0,True,2
+207,34,MS Electrical Engineering,electrical,masters,12,31000.0,15000.0,0.36,315,,7.9,6.5,,,0,42000.0,True,2
+208,34,MS Mechanical Engineering,mechanical,masters,12,31000.0,15000.0,0.27,318,,7.9,6.5,,,0,36000.0,True,2
+209,34,MS Civil Engineering,civil,masters,12,31000.0,15000.0,0.28,317,,8.2,6.5,,,0,32000.0,True,2
+210,34,MS Business Analytics,business_analytics,masters,12,34100.0,15000.0,0.36,315,,7.8,6.5,,,0,40000.0,True,2
+211,34,MS Finance,finance,masters,12,35600.0,15000.0,0.25,318,,8.0,6.5,,,0,48000.0,False,2
+212,34,MBA,mba,mba,12,49600.0,15000.0,0.3,,666,8.1,6.5,,,12,89000.0,False,2
+213,35,MS Computer Science,computer_science,masters,12,33000.0,18800.0,0.29,316,,7.9,6.5,,,0,48000.0,True,2
+214,35,MS Data Science,data_science,masters,12,33000.0,18800.0,0.35,318,,7.8,6.5,,,0,46000.0,True,2
+215,35,MS Finance,finance,masters,12,38000.0,18800.0,0.25,314,,8.0,6.5,,,0,48000.0,False,2
+216,35,Master of Public Health,public_health,masters,12,31400.0,18800.0,0.34,317,,8.0,6.5,,,0,34000.0,False,2
+217,36,MS Computer Science,computer_science,masters,12,32000.0,15000.0,0.25,316,,7.8,6.5,,,0,48000.0,True,2
+218,36,MS Data Science,data_science,masters,12,32000.0,15000.0,0.28,318,,8.2,6.5,,,0,44000.0,True,2
+219,36,MS Business Analytics,business_analytics,masters,12,35200.0,15000.0,0.29,318,,7.9,6.5,,,0,38000.0,True,2
+220,36,MS Finance,finance,masters,12,36800.0,15000.0,0.39,317,,7.9,6.5,,,0,49000.0,False,2
+221,36,MBA,mba,mba,12,51200.0,15000.0,0.37,,652,8.0,6.5,,,12,89000.0,False,2
+222,37,MS Computer Science,computer_science,masters,12,30000.0,15000.0,0.23,316,,8.0,6.5,,,0,48000.0,True,2
+223,37,MS Data Science,data_science,masters,12,30000.0,15000.0,0.38,314,,8.1,6.5,,,0,47000.0,True,2
+224,37,MS Electrical Engineering,electrical,masters,12,30000.0,15000.0,0.37,318,,8.0,6.5,,,0,39000.0,True,2
+225,37,MS Mechanical Engineering,mechanical,masters,12,30000.0,15000.0,0.36,314,,8.1,6.5,,,0,34000.0,True,2
+226,37,MS Civil Engineering,civil,masters,12,30000.0,15000.0,0.32,318,,7.9,6.5,,,0,33000.0,True,2
+227,37,MS Finance,finance,masters,12,34500.0,15000.0,0.31,316,,8.1,6.5,,,0,49000.0,False,2
+228,38,MS Computer Science,computer_science,masters,12,28000.0,15000.0,0.28,318,,7.9,6.5,,,0,52000.0,True,2
+229,38,MS Data Science,data_science,masters,12,28000.0,15000.0,0.34,313,,8.1,6.5,,,0,45000.0,True,2
+230,38,MS Electrical Engineering,electrical,masters,12,28000.0,15000.0,0.28,315,,8.1,6.5,,,0,39000.0,True,2
+231,38,MS Mechanical Engineering,mechanical,masters,12,28000.0,15000.0,0.36,317,,8.1,6.5,,,0,35000.0,True,2
+232,38,MS Civil Engineering,civil,masters,12,28000.0,15000.0,0.33,312,,7.9,6.5,,,0,31000.0,True,2
+233,38,MS Finance,finance,masters,12,32200.0,15000.0,0.39,312,,8.1,6.5,,,0,49000.0,False,2
+234,38,MS Business Analytics,business_analytics,masters,12,30800.0,15000.0,0.29,315,,7.8,6.5,,,0,40000.0,True,2
+235,39,MS Computer Science,computer_science,masters,12,28000.0,15000.0,0.23,313,,7.8,6.5,,,0,52000.0,True,2
+236,39,MS Data Science,data_science,masters,12,28000.0,15000.0,0.36,316,,8.1,6.5,,,0,44000.0,True,2
+237,39,MS Electrical Engineering,electrical,masters,12,28000.0,15000.0,0.33,318,,8.1,6.5,,,0,41000.0,True,2
+238,39,MS Mechanical Engineering,mechanical,masters,12,28000.0,15000.0,0.31,317,,8.1,6.5,,,0,37000.0,True,2
+239,39,MS Civil Engineering,civil,masters,12,28000.0,15000.0,0.35,312,,8.0,6.5,,,0,33000.0,True,2
+240,39,MS Business Analytics,business_analytics,masters,12,30800.0,15000.0,0.25,314,,8.2,6.5,,,0,41000.0,True,2
+241,40,MS Computer Science,computer_science,masters,12,28000.0,15000.0,0.35,312,,8.1,6.5,,,0,50000.0,True,2
+242,40,MS Data Science,data_science,masters,12,28000.0,15000.0,0.34,313,,8.1,6.5,,,0,43000.0,True,2
+243,40,MS Electrical Engineering,electrical,masters,12,28000.0,15000.0,0.38,318,,7.8,6.5,,,0,38000.0,True,2
+244,40,MS Mechanical Engineering,mechanical,masters,12,28000.0,15000.0,0.27,313,,8.0,6.5,,,0,35000.0,True,2
+245,40,MS Civil Engineering,civil,masters,12,28000.0,15000.0,0.31,313,,7.9,6.5,,,0,33000.0,True,2
+246,40,MS Business Analytics,business_analytics,masters,12,30800.0,15000.0,0.32,317,,7.9,6.5,,,0,40000.0,True,2
+247,40,MS Finance,finance,masters,12,32200.0,15000.0,0.38,315,,8.1,6.5,,,0,48000.0,False,2
+248,40,MBA,mba,mba,12,44800.0,15000.0,0.29,,673,8.1,6.5,,,12,86000.0,False,2
+249,41,MS Computer Science,computer_science,masters,12,27000.0,15000.0,0.68,303,,7.1,6.5,,,0,46000.0,True,2
+250,41,MS Data Science,data_science,masters,12,27000.0,15000.0,0.69,304,,7.4,6.5,,,0,42000.0,True,2
+251,41,MS Electrical Engineering,electrical,masters,12,27000.0,15000.0,0.56,308,,7.2,6.5,,,0,35000.0,True,2
+252,41,MS Mechanical Engineering,mechanical,masters,12,27000.0,15000.0,0.7,302,,7.2,6.5,,,0,33000.0,True,2
+253,41,MS Civil Engineering,civil,masters,12,27000.0,15000.0,0.59,307,,7.2,6.5,,,0,29000.0,True,2
+254,41,MS Business Analytics,business_analytics,masters,12,29700.0,15000.0,0.69,304,,7.1,6.5,,,0,37000.0,True,2
+255,41,MS Finance,finance,masters,12,31000.0,15000.0,0.67,302,,7.5,6.5,,,0,46000.0,False,2
+256,42,MS Computer Science,computer_science,masters,20,103300.0,33300.0,0.13,324,,8.9,7.0,,,0,107000.0,True,1
+257,42,MS Data Science,data_science,masters,20,103300.0,33300.0,0.08,323,,8.9,7.0,,,0,101000.0,True,1
+258,42,MS Electrical Engineering,electrical,masters,20,103300.0,33300.0,0.12,327,,8.9,7.0,,,0,94000.0,True,1
+259,42,MS Mechanical Engineering,mechanical,masters,20,103300.0,33300.0,0.12,322,,9.0,7.0,,,0,78000.0,True,1
+260,42,MS Civil Engineering,civil,masters,20,103300.0,33300.0,0.12,325,,8.6,7.0,,,0,73000.0,True,1
+261,42,MBA,mba,mba,20,165300.0,33300.0,0.09,,734,8.7,7.0,,,24,111000.0,False,1
+262,42,MS Finance,finance,masters,20,118800.0,33300.0,0.13,323,,8.9,7.0,,,0,83000.0,False,1
+263,42,Master of Public Health,public_health,masters,20,98200.0,33300.0,0.14,326,,9.0,7.0,,,0,68000.0,False,1
+264,43,MS Computer Science,computer_science,masters,20,80000.0,33300.0,0.13,328,,9.0,7.0,,,0,101000.0,True,1
+265,43,MS Data Science,data_science,masters,20,80000.0,33300.0,0.15,328,,8.7,7.0,,,0,96000.0,True,1
+266,43,MS Electrical Engineering,electrical,masters,20,80000.0,33300.0,0.07,323,,8.9,7.0,,,0,96000.0,True,1
+267,43,MS Mechanical Engineering,mechanical,masters,20,80000.0,33300.0,0.08,327,,9.0,7.0,,,0,82000.0,True,1
+268,43,MS Civil Engineering,civil,masters,20,80000.0,33300.0,0.15,324,,8.6,7.0,,,0,77000.0,True,1
+269,43,MBA,mba,mba,20,128000.0,33300.0,0.1,,708,8.8,7.0,,,24,112000.0,False,1
+270,43,MS Business Analytics,business_analytics,masters,20,88000.0,33300.0,0.12,326,,8.8,7.0,,,0,84000.0,True,1
+271,43,Master of Public Health,public_health,masters,20,76000.0,33300.0,0.12,327,,8.7,7.0,,,0,68000.0,False,1
+272,44,MS Computer Science,computer_science,masters,20,66700.0,33300.0,0.06,326,,8.7,7.0,,,0,107000.0,True,1
+273,44,MS Data Science,data_science,masters,20,66700.0,33300.0,0.11,327,,8.9,7.0,,,0,99000.0,True,1
+274,44,MS Electrical Engineering,electrical,masters,20,66700.0,33300.0,0.14,325,,8.6,7.0,,,0,90000.0,True,1
+275,44,MS Mechanical Engineering,mechanical,masters,20,66700.0,33300.0,0.06,325,,8.6,7.0,,,0,77000.0,True,1
+276,44,MS Civil Engineering,civil,masters,20,66700.0,33300.0,0.08,325,,8.8,7.0,,,0,75000.0,True,1
+277,44,MBA,mba,mba,20,106700.0,33300.0,0.12,,735,8.8,7.0,,,24,118000.0,False,1
+278,44,MS Finance,finance,masters,20,76700.0,33300.0,0.11,325,,8.9,7.0,,,0,88000.0,False,1
+279,45,MS Computer Science,computer_science,masters,20,75000.0,33300.0,0.14,324,,8.6,7.0,,,0,105000.0,True,1
+280,45,MS Data Science,data_science,masters,20,75000.0,33300.0,0.09,323,,8.9,7.0,,,0,97000.0,True,1
+281,45,MS Electrical Engineering,electrical,masters,20,75000.0,33300.0,0.07,326,,9.0,7.0,,,0,94000.0,True,1
+282,45,MS Mechanical Engineering,mechanical,masters,20,75000.0,33300.0,0.12,324,,8.7,7.0,,,0,77000.0,True,1
+283,45,MS Civil Engineering,civil,masters,20,75000.0,33300.0,0.07,325,,8.6,7.0,,,0,77000.0,True,1
+284,46,MS Computer Science,computer_science,masters,20,50000.0,33300.0,0.24,312,,7.8,6.5,,,0,91000.0,True,1
+285,46,MS Data Science,data_science,masters,20,50000.0,33300.0,0.27,318,,8.0,6.5,,,0,89000.0,True,1
+286,46,MS Electrical Engineering,electrical,masters,20,50000.0,33300.0,0.21,313,,8.0,6.5,,,0,82000.0,True,1
+287,46,MS Mechanical Engineering,mechanical,masters,20,50000.0,33300.0,0.36,318,,7.9,6.5,,,0,68000.0,True,1
+288,46,MS Civil Engineering,civil,masters,20,50000.0,33300.0,0.38,318,,8.2,6.5,,,0,62000.0,True,1
+289,46,MBA,mba,mba,20,80000.0,33300.0,0.4,,670,7.9,6.5,,,12,100000.0,False,1
+290,47,MS Computer Science,computer_science,masters,20,53300.0,33300.0,0.33,312,,7.9,6.5,,,0,86000.0,True,1
+291,47,MS Data Science,data_science,masters,20,53300.0,33300.0,0.36,312,,7.9,6.5,,,0,86000.0,True,1
+292,47,MS Electrical Engineering,electrical,masters,20,53300.0,33300.0,0.21,316,,7.8,6.5,,,0,82000.0,True,1
+293,47,MS Mechanical Engineering,mechanical,masters,20,53300.0,33300.0,0.21,314,,8.0,6.5,,,0,70000.0,True,1
+294,47,MS Civil Engineering,civil,masters,20,53300.0,33300.0,0.22,316,,7.8,6.5,,,0,65000.0,True,1
+295,47,MBA,mba,mba,20,85300.0,33300.0,0.36,,661,7.9,6.5,,,12,104000.0,False,1
+296,47,Master of Public Health,public_health,masters,20,50700.0,33300.0,0.33,315,,8.1,6.5,,,0,57000.0,False,1
+297,48,MS Computer Science,computer_science,masters,20,46700.0,33300.0,0.56,307,,7.5,6.5,,,0,78000.0,True,1
+298,48,MS Data Science,data_science,masters,20,46700.0,33300.0,0.47,306,,7.2,6.5,,,0,73000.0,True,1
+299,48,MS Electrical Engineering,electrical,masters,20,46700.0,33300.0,0.48,306,,7.3,6.5,,,0,73000.0,True,1
+300,48,MS Mechanical Engineering,mechanical,masters,20,46700.0,33300.0,0.53,306,,7.2,6.5,,,0,66000.0,True,1
+301,48,MS Civil Engineering,civil,masters,20,46700.0,33300.0,0.58,308,,7.4,6.5,,,0,58000.0,True,1
+302,48,MS Business Analytics,business_analytics,masters,20,51300.0,33300.0,0.66,308,,7.3,6.5,,,0,66000.0,True,1
+303,48,MS Finance,finance,masters,20,53700.0,33300.0,0.67,303,,7.3,6.5,,,0,67000.0,False,1
+304,49,MS Computer Science,computer_science,masters,20,43300.0,33300.0,0.66,307,,7.1,6.5,,,0,80000.0,True,1
+305,49,MS Data Science,data_science,masters,20,43300.0,33300.0,0.56,304,,7.5,6.5,,,0,78000.0,True,1
+306,49,MS Electrical Engineering,electrical,masters,20,43300.0,33300.0,0.62,302,,7.4,6.5,,,0,72000.0,True,1
+307,49,MS Mechanical Engineering,mechanical,masters,20,43300.0,33300.0,0.47,307,,7.2,6.5,,,0,60000.0,True,1
+308,49,MBA,mba,mba,20,69300.0,33300.0,0.48,,615,7.3,6.5,,,12,86000.0,False,1
+309,50,MS Computer Science,computer_science,masters,24,24000.0,24000.0,0.09,324,,8.9,7.0,,,0,64000.0,True,5
+310,50,MS Data Science,data_science,masters,24,24000.0,24000.0,0.14,327,,8.6,7.0,,,0,64000.0,True,5
+311,50,MS Electrical Engineering,electrical,masters,24,24000.0,24000.0,0.09,322,,8.8,7.0,,,0,62000.0,True,5
+312,50,MS Mechanical Engineering,mechanical,masters,24,24000.0,24000.0,0.08,323,,8.9,7.0,,,0,61000.0,True,5
+313,50,MS Civil Engineering,civil,masters,24,24000.0,24000.0,0.09,322,,8.9,7.0,,,0,56000.0,True,5
+314,50,MS Business Analytics,business_analytics,masters,24,26400.0,24000.0,0.11,328,,8.8,7.0,,,0,62000.0,True,5
+315,50,MBA,mba,mba,18,28800.0,18000.0,0.13,,726,8.9,7.0,,,24,87000.0,False,5
+316,51,MS Computer Science,computer_science,masters,24,3000.0,24000.0,0.06,328,,8.9,7.0,,,0,70000.0,True,5
+317,51,MS Data Science,data_science,masters,24,3000.0,24000.0,0.06,328,,8.7,7.0,,,0,63000.0,True,5
+318,51,MS Electrical Engineering,electrical,masters,24,3000.0,24000.0,0.09,328,,8.7,7.0,,,0,60000.0,True,5
+319,51,MS Mechanical Engineering,mechanical,masters,24,3000.0,24000.0,0.12,327,,8.9,7.0,,,0,57000.0,True,5
+320,51,MS Civil Engineering,civil,masters,24,3000.0,24000.0,0.06,323,,8.8,7.0,,,0,57000.0,True,5
+321,51,MS Business Analytics,business_analytics,masters,24,3300.0,24000.0,0.1,324,,8.9,7.0,,,0,58000.0,True,5
+322,52,MS Computer Science,computer_science,masters,24,6000.0,24000.0,0.36,312,,8.2,6.5,,,0,58000.0,True,5
+323,52,MS Data Science,data_science,masters,24,6000.0,24000.0,0.23,312,,8.1,6.5,,,0,57000.0,True,5
+324,52,MS Electrical Engineering,electrical,masters,24,6000.0,24000.0,0.25,315,,8.0,6.5,,,0,56000.0,True,5
+325,52,MS Mechanical Engineering,mechanical,masters,24,6000.0,24000.0,0.28,316,,7.8,6.5,,,0,51000.0,True,5
+326,52,MS Civil Engineering,civil,masters,24,6000.0,24000.0,0.29,317,,8.0,6.5,,,0,47000.0,True,5
+327,53,MS Computer Science,computer_science,masters,24,3000.0,24000.0,0.31,313,,8.0,6.5,,,0,57000.0,True,5
+328,53,MS Data Science,data_science,masters,24,3000.0,24000.0,0.32,314,,8.2,6.5,,,0,53000.0,True,5
+329,53,MS Electrical Engineering,electrical,masters,24,3000.0,24000.0,0.35,314,,7.9,6.5,,,0,56000.0,True,5
+330,53,MS Mechanical Engineering,mechanical,masters,24,3000.0,24000.0,0.2,313,,7.9,6.5,,,0,53000.0,True,5
+331,53,MS Civil Engineering,civil,masters,24,3000.0,24000.0,0.31,316,,8.1,6.5,,,0,47000.0,True,5
+332,53,MS Business Analytics,business_analytics,masters,24,3300.0,24000.0,0.36,318,,8.1,6.5,,,0,50000.0,True,5
+333,54,MS Data Science,data_science,masters,24,3000.0,24000.0,0.29,312,,8.1,6.5,,,0,56000.0,True,5
+334,54,MS Finance,finance,masters,24,3400.0,24000.0,0.32,317,,8.1,6.5,,,0,55000.0,False,5
+335,54,Master of Public Health,public_health,masters,24,2800.0,24000.0,0.26,314,,7.9,6.5,,,0,45000.0,False,5
+336,54,MS Business Analytics,business_analytics,masters,24,3300.0,24000.0,0.39,317,,8.2,6.5,,,0,52000.0,True,5
+337,55,MS Computer Science,computer_science,masters,12,28000.0,15000.0,0.07,323,,8.8,7.0,,,0,65000.0,True,3
+338,55,MS Data Science,data_science,masters,12,28000.0,15000.0,0.1,328,,8.7,7.0,,,0,57000.0,True,3
+339,55,MS Electrical Engineering,electrical,masters,12,28000.0,15000.0,0.09,323,,8.6,7.0,,,0,54000.0,True,3
+340,55,MBA,mba,mba,12,44800.0,15000.0,0.12,,711,9.0,7.0,,,24,92000.0,False,3
+341,55,MS Finance,finance,masters,12,32200.0,15000.0,0.09,328,,8.9,7.0,,,0,61000.0,False,3
+342,56,MS Computer Science,computer_science,masters,12,27000.0,15000.0,0.23,314,,7.9,6.5,,,0,53000.0,True,3
+343,56,MS Data Science,data_science,masters,12,27000.0,15000.0,0.32,317,,7.8,6.5,,,0,53000.0,True,3
+344,56,MS Electrical Engineering,electrical,masters,12,27000.0,15000.0,0.39,315,,8.1,6.5,,,0,49000.0,True,3
+345,56,MS Mechanical Engineering,mechanical,masters,12,27000.0,15000.0,0.35,316,,8.1,6.5,,,0,42000.0,True,3
+346,56,MS Civil Engineering,civil,masters,12,27000.0,15000.0,0.4,317,,7.9,6.5,,,0,39000.0,True,3
+347,56,MS Business Analytics,business_analytics,masters,12,29700.0,15000.0,0.29,317,,7.9,6.5,,,0,48000.0,True,3
+348,56,MS Finance,finance,masters,12,31000.0,15000.0,0.25,316,,7.8,6.5,,,0,50000.0,False,3
+349,56,MBA,mba,mba,12,43200.0,15000.0,0.29,,656,8.1,6.5,,,12,76000.0,False,3
+350,56,Master of Public Health,public_health,masters,12,25600.0,15000.0,0.22,318,,7.8,6.5,,,0,44000.0,False,3
+351,57,MS Computer Science,computer_science,masters,24,104000.0,56000.0,0.11,326,,8.8,7.0,,,0,108000.0,True,10
+352,57,MS Data Science,data_science,masters,24,104000.0,56000.0,0.13,325,,9.0,7.0,,,0,108000.0,True,10
+353,57,MS Electrical Engineering,electrical,masters,24,104000.0,56000.0,0.11,326,,8.8,7.0,,,0,95000.0,True,10
+354,57,MS Mechanical Engineering,mechanical,masters,24,104000.0,56000.0,0.07,322,,8.9,7.0,,,0,88000.0,True,10
+355,57,MS Civil Engineering,civil,masters,24,104000.0,56000.0,0.14,322,,8.8,7.0,,,0,90000.0,True,10
+356,57,MBA,mba,mba,24,166400.0,56000.0,0.08,,719,9.0,7.0,,,24,135000.0,False,10
+357,57,MS Business Analytics,business_analytics,masters,24,114400.0,56000.0,0.11,324,,8.7,7.0,,,0,95000.0,True,10
+358,57,MS Finance,finance,masters,24,119600.0,56000.0,0.09,324,,8.9,7.0,,,0,97000.0,False,10
+359,57,Master of Public Health,public_health,masters,24,98800.0,56000.0,0.06,324,,8.6,7.0,,,0,82000.0,False,10
+360,58,MS Computer Science,computer_science,masters,24,108000.0,70000.0,0.07,324,,8.7,7.0,,,0,111000.0,True,10
+361,58,MS Data Science,data_science,masters,24,108000.0,70000.0,0.14,326,,8.9,7.0,,,0,108000.0,True,10
+362,58,MS Electrical Engineering,electrical,masters,24,108000.0,70000.0,0.09,323,,9.0,7.0,,,0,99000.0,True,10
+363,58,MS Mechanical Engineering,mechanical,masters,24,108000.0,70000.0,0.09,327,,8.8,7.0,,,0,93000.0,True,10
+364,58,MS Civil Engineering,civil,masters,24,108000.0,70000.0,0.11,324,,8.8,7.0,,,0,90000.0,True,10
+365,58,MS Business Analytics,business_analytics,masters,24,118800.0,70000.0,0.12,323,,8.9,7.0,,,0,93000.0,True,10
+366,58,MS Finance,finance,masters,24,124200.0,70000.0,0.13,327,,9.0,7.0,,,0,100000.0,False,10
+367,58,Master of Public Health,public_health,masters,24,102600.0,70000.0,0.07,326,,8.7,7.0,,,0,82000.0,False,10
+368,59,MS Computer Science,computer_science,masters,24,104000.0,70000.0,0.09,323,,8.7,7.0,,,0,106000.0,True,10
+369,59,MS Data Science,data_science,masters,24,104000.0,70000.0,0.13,323,,8.7,7.0,,,0,100000.0,True,10
+370,59,MS Electrical Engineering,electrical,masters,24,104000.0,70000.0,0.09,326,,8.9,7.0,,,0,101000.0,True,10
+371,59,MS Mechanical Engineering,mechanical,masters,24,104000.0,70000.0,0.14,322,,8.9,7.0,,,0,96000.0,True,10
+372,59,MS Civil Engineering,civil,masters,24,104000.0,70000.0,0.14,326,,8.8,7.0,,,0,87000.0,True,10
+373,59,MBA,mba,mba,24,166400.0,70000.0,0.07,,729,8.8,7.0,,,24,143000.0,False,10
+374,59,MS Business Analytics,business_analytics,masters,24,114400.0,70000.0,0.14,322,,8.8,7.0,,,0,96000.0,True,10
+375,59,MS Finance,finance,masters,24,119600.0,70000.0,0.12,325,,8.8,7.0,,,0,95000.0,False,10
+376,59,Master of Public Health,public_health,masters,24,98800.0,70000.0,0.13,323,,8.8,7.0,,,0,83000.0,False,10
+377,60,MS Computer Science,computer_science,masters,24,96000.0,56000.0,0.26,315,,8.2,6.5,,,0,98000.0,True,10
+378,60,MS Data Science,data_science,masters,24,96000.0,56000.0,0.24,316,,8.2,6.5,,,0,92000.0,True,10
+379,60,MS Electrical Engineering,electrical,masters,24,96000.0,56000.0,0.29,315,,8.0,6.5,,,0,83000.0,True,10
+380,60,MS Mechanical Engineering,mechanical,masters,24,96000.0,56000.0,0.28,313,,8.1,6.5,,,0,77000.0,True,10
+381,60,MS Civil Engineering,civil,masters,24,96000.0,56000.0,0.23,317,,8.0,6.5,,,0,73000.0,True,10
+382,60,MS Business Analytics,business_analytics,masters,24,105600.0,56000.0,0.27,317,,8.1,6.5,,,0,86000.0,True,10
+383,60,MS Finance,finance,masters,24,110400.0,56000.0,0.37,318,,7.9,6.5,,,0,83000.0,False,10
+384,60,Master of Public Health,public_health,masters,24,91200.0,56000.0,0.29,318,,8.0,6.5,,,0,70000.0,False,10
+385,61,MS Computer Science,computer_science,masters,24,100000.0,56000.0,0.39,315,,8.2,6.5,,,0,92000.0,True,10
+386,61,MS Data Science,data_science,masters,24,100000.0,56000.0,0.39,315,,8.0,6.5,,,0,89000.0,True,10
+387,61,MS Electrical Engineering,electrical,masters,24,100000.0,56000.0,0.25,314,,7.9,6.5,,,0,89000.0,True,10
+388,61,MS Finance,finance,masters,24,115000.0,56000.0,0.26,317,,8.1,6.5,,,0,82000.0,False,10
+389,61,Master of Public Health,public_health,masters,24,95000.0,56000.0,0.36,314,,8.2,6.5,,,0,67000.0,False,10
+390,62,MS Computer Science,computer_science,masters,18,31500.0,21000.0,0.1,328,,8.9,7.0,,,0,65000.0,True,2
+391,62,MS Data Science,data_science,masters,18,31500.0,21000.0,0.1,322,,8.6,7.0,,,0,57000.0,True,2
+392,62,MS Electrical Engineering,electrical,masters,18,31500.0,21000.0,0.08,327,,8.8,7.0,,,0,55000.0,True,2
+393,62,MS Mechanical Engineering,mechanical,masters,18,31500.0,21000.0,0.1,323,,8.7,7.0,,,0,56000.0,True,2
+394,62,MS Civil Engineering,civil,masters,18,31500.0,21000.0,0.06,328,,8.8,7.0,,,0,51000.0,True,2
+395,63,MS Data Science,data_science,masters,18,30000.0,21000.0,0.21,315,,8.0,6.5,,,0,54000.0,True,2
+396,63,MS Computer Science,computer_science,masters,18,30000.0,21000.0,0.2,313,,8.1,6.5,,,0,55000.0,True,2
+397,63,MS Finance,finance,masters,18,34500.0,21000.0,0.26,314,,7.9,6.5,,,0,49000.0,False,2
+398,63,MS Business Analytics,business_analytics,masters,18,33000.0,21000.0,0.28,312,,8.0,6.5,,,0,49000.0,True,2
+399,63,Master of Public Health,public_health,masters,18,28500.0,21000.0,0.27,316,,8.0,6.5,,,0,44000.0,False,2
+400,64,M.Tech Computer Science,computer_science,masters,24,240000.0,375000.0,0.15,,,8.8,,GATE,99.0,0,2891000.0,True,11
+401,64,M.Tech Data Science & AI,data_science,masters,24,240000.0,375000.0,0.1,,,9.0,,GATE,99.0,0,2331000.0,True,11
+402,64,M.Tech Electrical Engineering,electrical,masters,24,240000.0,375000.0,0.08,,,8.9,,GATE,99.0,0,1970000.0,True,11
+403,64,M.Tech Mechanical Engineering,mechanical,masters,24,240000.0,375000.0,0.09,,,8.9,,GATE,99.0,0,1412000.0,True,11
+404,65,M.Tech Computer Science,computer_science,masters,24,240000.0,300000.0,0.13,,,8.7,,GATE,99.0,0,2943000.0,True,11
+405,65,M.Tech Data Science & AI,data_science,masters,24,240000.0,300000.0,0.06,,,8.9,,GATE,99.0,0,2311000.0,True,11
+406,65,M.Tech Electrical Engineering,electrical,masters,24,240000.0,300000.0,0.08,,,8.8,,GATE,99.0,0,2128000.0,True,11
+407,65,M.Tech Mechanical Engineering,mechanical,masters,24,240000.0,300000.0,0.12,,,8.9,,GATE,99.0,0,1398000.0,True,11
+408,66,M.Tech Computer Science,computer_science,masters,24,240000.0,300000.0,0.07,,,8.8,,GATE,99.0,0,2954000.0,True,11
+409,66,M.Tech Data Science & AI,data_science,masters,24,240000.0,300000.0,0.09,,,8.7,,GATE,99.0,0,2195000.0,True,11
+410,66,M.Tech Electrical Engineering,electrical,masters,24,240000.0,300000.0,0.06,,,8.8,,GATE,99.0,0,2160000.0,True,11
+411,66,M.Tech Mechanical Engineering,mechanical,masters,24,240000.0,300000.0,0.15,,,8.7,,GATE,99.0,0,1386000.0,True,11
+412,67,M.Tech Computer Science,computer_science,masters,24,100000.0,300000.0,0.13,,,8.7,,GATE,99.0,0,2786000.0,True,11
+413,67,M.Tech Data Science & AI,data_science,masters,24,100000.0,300000.0,0.13,,,8.7,,GATE,99.0,0,2384000.0,True,11
+414,67,M.Tech Electrical Engineering,electrical,masters,24,100000.0,300000.0,0.07,,,9.0,,GATE,99.0,0,2043000.0,True,11
+415,67,M.Tech Mechanical Engineering,mechanical,masters,24,100000.0,300000.0,0.13,,,8.8,,GATE,99.0,0,1434000.0,True,11
+416,68,MBA / PGP,mba,mba,24,2600000.0,300000.0,0.15,,,8.8,,CAT,99.0,24,3449000.0,False,11
+417,68,PG Diploma Business Analytics,business_analytics,masters,12,1300000.0,150000.0,0.14,,,8.9,,CAT,99.0,0,1728000.0,True,11
+418,69,MBA / PGP,mba,mba,24,2500000.0,300000.0,0.13,,,8.8,,CAT,99.0,24,3305000.0,False,11
+419,69,PG Diploma Business Analytics,business_analytics,masters,12,1250000.0,150000.0,0.13,,,8.7,,CAT,99.0,0,1733000.0,True,11
+420,70,MBA / PGP,mba,mba,12,4000000.0,150000.0,0.07,,,8.7,,CAT,99.0,24,3506000.0,False,11
+421,71,M.Tech Computer Science,computer_science,masters,24,600000.0,300000.0,0.32,,,8.1,,GATE,95.0,0,2482000.0,True,11
+422,71,M.Tech Data Science & AI,data_science,masters,24,600000.0,300000.0,0.27,,,8.1,,GATE,95.0,0,1908000.0,True,11
+423,72,M.Tech Computer Science,computer_science,masters,24,700000.0,300000.0,0.27,,,7.9,,GATE,95.0,0,2625000.0,True,11
+424,72,M.Tech Data Science & AI,data_science,masters,24,700000.0,300000.0,0.4,,,7.8,,GATE,95.0,0,2090000.0,True,11
+425,72,M.Tech Electrical Engineering,electrical,masters,24,700000.0,300000.0,0.33,,,8.1,,GATE,95.0,0,1775000.0,True,11
+426,72,M.Tech Mechanical Engineering,mechanical,masters,24,700000.0,300000.0,0.34,,,7.9,,GATE,95.0,0,1254000.0,True,11
+427,72,MBA Finance,finance,masters,24,700000.0,300000.0,0.32,,,7.8,,CAT,95.0,0,1851000.0,False,11
+428,73,M.Tech Computer Science,computer_science,masters,24,300000.0,300000.0,0.21,,,7.9,,GATE,95.0,0,2570000.0,True,11
+429,73,M.Tech Data Science & AI,data_science,masters,24,300000.0,300000.0,0.28,,,8.0,,GATE,95.0,0,2013000.0,True,11
+430,73,M.Tech Electrical Engineering,electrical,masters,24,300000.0,300000.0,0.34,,,7.9,,GATE,95.0,0,1881000.0,True,11
+431,73,M.Tech Mechanical Engineering,mechanical,masters,24,300000.0,300000.0,0.35,,,8.0,,GATE,95.0,0,1209000.0,True,11
+432,74,MBA / PGP,mba,mba,24,2200000.0,375000.0,0.55,,,7.2,,CAT,85.0,12,2740000.0,False,11
+433,74,MBA Finance,finance,masters,24,2200000.0,375000.0,0.48,,,7.3,,CAT,85.0,0,1658000.0,False,11
+434,74,PG Diploma Business Analytics,business_analytics,masters,12,1100000.0,187500.0,0.55,,,7.2,,CAT,85.0,0,1358000.0,True,11

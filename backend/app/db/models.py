@@ -50,6 +50,8 @@ class StudentProfile(SQLModel, table=True):
     gmat: int | None = None
     ielts: float | None = None
     toefl: int | None = None
+    entrance_exam: str | None = None  # India: CAT | GATE | GMAT
+    entrance_percentile: float | None = None
 
     # Goals
     target_level: str | None = None  # masters | mba | phd
