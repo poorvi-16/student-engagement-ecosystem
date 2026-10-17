@@ -6,6 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 In progress — see the build schedule checkboxes. Sections describe the target design; update them as pieces become real. Full plan: `docs/PLAN.md`.
 **Work phase-wise: finish one step, report, and get the user's explicit go-ahead before starting the next.**
 
+## Git workflow (required after every completed step)
+Remote: `origin` → https://github.com/poorvi-16/student-engagement-ecosystem (branch `main`). Render and Vercel deploy from it.
+1. When a step is done and tests/lint pass, commit and **push to `origin main`** so a saved version always exists on GitHub.
+2. Commit messages must be detailed and clear:
+   - Subject: imperative, ≤72 chars, names the step (e.g. `Step 1.5: Add Claude wrapper and AI Career Navigator`).
+   - Body: what was added/changed, grouped by **Backend / Frontend / Database / Tests / Docs**, noting new migrations, env vars, and anything the user must do manually.
+3. Before committing, confirm no secrets are staged: `git ls-files --cached | grep -E "\.env($|\.local)"` must print nothing.
+4. Never force-push or rewrite pushed history.
+
 ## Project
 AI-first student engagement platform ("SoFi for Indian students") for UG students and young professionals planning PG study abroad or in India. The funnel is **awareness → engagement → trust → education-loan conversion**. Deliverables: a working prototype **deployed publicly for real testers** and a solution deck. It is judged on innovation, depth of AI usage, UX/stickiness, NBFC-aware conversion thinking, and prototype quality. Bonus: a zero-human AI growth loop.
 
@@ -52,6 +61,10 @@ Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, 
 
 **Auth.** Frontend uses supabase-js (implicit flow; email+password primary, magic link/Google secondary) and sends the access token as `Bearer` to the API. `app/auth.py:current_user` verifies it (HS256 via `SUPABASE_JWT_SECRET`, or ES256/RS256 via the project JWKS — this project uses ES256) and lazily creates the `User` row on first request; `ADMIN_EMAILS` grants admin. Frontend never talks to Supabase tables directly.
 
+**LLM calls.** Always go through `app/llm.py` (`llm.parse(session, user, feature=, system=, prompt=, output=PydanticModel, tier="fast"|"smart")`): it enforces `DAILY_LLM_LIMIT` per user and `MONTHLY_LLM_BUDGET` globally, caches the system prompt, handles refusals, and logs cost to `llmusage`. It raises `LLMUnavailable` (with a user-facing message) — every feature must catch it and fall back to non-AI output. Cache deterministic-input results in `AiCache` keyed by a hash of the inputs + a prompt version (see `services/navigator.py`). Send no names/emails to the model.
+
+**Navigator.** `services/navigator.py:build_matches` filters the catalog by target countries/field/level, scores with `ml/admit.py:admit_chance` (heuristic now; Day 2 swaps in the trained model behind the same signature), buckets Ambitious <25% / Target <60% / Safe, ranks by tier-weighted salary/cost, one program per university. Claude (Haiku) only writes `why`/`watch_out` text. Shortlist (`shortlist` table) moves journey stage explorer → shortlister.
+
 **Deterministic vs LLM.** Loan eligibility, offers, EMI, and FOIR are **pure rule code** in `rules/` and are unit-tested; never let the LLM compute money or decide eligibility. ML gives scores. The LLM explains, converses, generates content, and extracts documents.
 
 **Growth engine.** Every user action is written to an `events` table. Journey stage (Explorer → Shortlister → Applicant → Admitted → Funding), interest tags, and lead score are derived from events. This drives feed ordering, nudges, and when the loan copilot is triggered. The Growth Orchestrator (scheduled) chains content agent → nudge agent → loan copilot trigger → metrics/A-B feedback. Every agent action is logged to an `agent_runs` table that the admin Agent Console displays. A user simulator generates a synthetic cohort so the loop has data to act on.
@@ -59,6 +72,7 @@ Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, 
 ## Rules specific to this project
 - **RLS on every table:** Supabase exposes `public` tables to the anon key via REST. Every new table must get `ENABLE ROW LEVEL SECURITY` (no policies) in its migration — see `migrations/versions/d2a058d4850b_enable_rls_on_app_tables.py`. The backend connects as the owner and bypasses RLS.
 - **DB connection:** use the Supabase **Session pooler** URL (`postgres.<ref>@aws-…pooler.supabase.com:5432`); the direct `db.<ref>.supabase.co` host is IPv6-only and fails on this machine. Project region is ap-northeast-2 → deploy Render in Singapore.
+- **Env changes need a backend restart:** settings are cached and `--reload` only watches `.py` files.
 - **Local dev ports:** frontend must run on `localhost:3000` (CORS `FRONTEND_ORIGIN`). If Next says the port is in use, kill the stale `next dev` process rather than continuing on 3001.
 - **Multi-user and public:** every DB query is scoped by the `user_id` from the verified Supabase JWT. Admin routes require the admin role.
 - **Simulated finance:** CIBIL, NBFC, WhatsApp, and email are mocks in `mocks/`. The UI must label loan offers as simulated/indicative. No real credit decisions; final approval is shown as "human credit review".
@@ -86,7 +100,7 @@ Deploy early and continuously. The skeleton goes live on Day 1, and every push t
 Free-tier note: the Render free instance sleeps when idle, so the first request takes about 30–60s. Hit `/health` before a demo.
 
 ## Build schedule (4 days)
-- [ ] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ⬜ 1.4 deploy · ⬜ 1.5 Claude wrapper + navigator)
+- [ ] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ⬜ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
 - [ ] **Day 2 – AI modules**: RAG ingest + mentor chat (streaming, tools, citations), synthetic data + admit model with what-if sliders, ROI calculator, timeline generator, SOP reviewer + visa mock interview (single prompt flows).
 - [ ] **Day 3 – Loan funnel + growth**: eligibility rules, dynamic offers, EMI/moratorium planner, loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker. Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.

@@ -7,3 +7,4 @@ sqlmodel>=0.0.22
 alembic>=1.14
 psycopg[binary]>=3.2
 pyjwt[crypto]>=2.10
+anthropic>=1.15

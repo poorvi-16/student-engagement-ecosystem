@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 # Supabase exposes the public schema via its REST API using the (public) anon key.
 # RLS with no policies denies that path entirely; the backend connects as the table
 # owner, which bypasses RLS. New tables must be added here (or in their own migration).
-TABLES = ["user", "studentprofile", "event", "alembic_version"]
+TABLES = ["user", "studentprofile", "event", "alembic_version"]  # later tables enable RLS in their own migrations
 
 
 def upgrade() -> None:

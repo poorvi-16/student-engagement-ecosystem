@@ -69,6 +69,27 @@ export default function DashboardPage() {
                   Targeting {me.profile.target_countries.join(", ")} · {me.profile.target_intake}
                 </p>
               </section>
+            ) : null}
+
+            {me.profile ? (
+              <section className="grid gap-4 sm:grid-cols-2">
+                <Link
+                  href="/navigator"
+                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                >
+                  <p className="text-2xl">🧭</p>
+                  <h2 className="mt-2 font-semibold">Career Navigator</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    AI-matched universities split into Ambitious, Target and Safe — with costs, salaries and payback.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">+50 XP on first run</p>
+                </Link>
+                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 dark:border-gray-700">
+                  <p className="text-2xl">🔒</p>
+                  <h2 className="mt-2 font-semibold">More tools coming</h2>
+                  <p className="text-sm">Admission predictor, ROI calculator, AI mentor and loan planner unlock next.</p>
+                </div>
+              </section>
             ) : (
               <section className="rounded-xl border-2 border-dashed border-indigo-300 p-6 text-center dark:border-indigo-800">
                 <h2 className="text-lg font-semibold">Find out how strong your profile is</h2>

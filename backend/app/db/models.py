@@ -4,7 +4,7 @@ import secrets
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import JSON, Column
+from sqlalchemy import JSON, Column, UniqueConstraint
 from sqlmodel import Field, SQLModel
 
 
@@ -87,3 +87,39 @@ class Event(SQLModel, table=True):
     type: str = Field(index=True)  # e.g. quiz_completed, navigator_run, chat_message, loan_estimate
     payload: dict = Field(default_factory=dict, sa_column=Column(JSON))
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class LlmUsage(SQLModel, table=True):
+    """One row per Claude call. Drives per-user daily limits and the global monthly budget."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID | None = Field(default=None, foreign_key="user.id", index=True)  # None = system agent
+    feature: str = Field(index=True)  # navigator, mentor, content_agent, ...
+    model: str
+    input_tokens: int = 0
+    output_tokens: int = 0
+    cache_read_tokens: int = 0
+    cache_write_tokens: int = 0
+    cost_usd: float = 0.0
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class AiCache(SQLModel, table=True):
+    """Caches deterministic-input LLM results (e.g. navigator explanations) so reloads cost nothing."""
+
+    __table_args__ = (UniqueConstraint("user_id", "feature", "input_hash"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    feature: str
+    input_hash: str
+    output: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class Shortlist(SQLModel, table=True):
+    """Courses a student starred. course_id refers to the in-memory catalog (backend/data/courses.csv)."""
+
+    user_id: uuid.UUID = Field(primary_key=True, foreign_key="user.id")
+    course_id: int = Field(primary_key=True)
+    created_at: datetime = Field(default_factory=utcnow)
