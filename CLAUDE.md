@@ -97,10 +97,12 @@ Deploy early and continuously. The skeleton goes live on Day 1, and every push t
    - sign-up → loan-application has been tested end-to-end on the live URL with 2–3 separate accounts, confirming no data leaks between users.
 8. Share the Vercel link. The in-app feedback button collects tester issues.
 
+**Live:** frontend https://student-engagement-ecosystem.vercel.app · API https://pathpilot-api-n4ox.onrender.com (`/health`). Steps 1–6 are done except the `vector` extension and `loan-docs` bucket (Day 2/3); step 7 runs on Day 4.
+
 Free-tier note: the Render free instance sleeps when idle, so the first request takes about 30–60s. Hit `/health` before a demo.
 
 ## Build schedule (4 days)
-- [ ] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ⬜ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
+- [x] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ✅ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
 - [ ] **Day 2 – AI modules**: RAG ingest + mentor chat (streaming, tools, citations), synthetic data + admit model with what-if sliders, ROI calculator, timeline generator, SOP reviewer + visa mock interview (single prompt flows).
 - [ ] **Day 3 – Loan funnel + growth**: eligibility rules, dynamic offers, EMI/moratorium planner, loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker. Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.
