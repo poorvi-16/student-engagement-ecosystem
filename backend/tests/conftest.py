@@ -14,6 +14,15 @@ from app.main import app
 TEST_JWT_SECRET = "test-secret-for-hs256-tokens-only-0123456789"
 
 
+@pytest.fixture(autouse=True)
+def no_llm_keys(monkeypatch):
+    """Tests never call real LLM providers, even if backend/.env has keys. Tests opt in with fakes."""
+    s = get_settings()
+    for k in ("gemini_api_key", "groq_api_key", "anthropic_api_key"):
+        monkeypatch.setattr(s, k, "")
+    monkeypatch.setattr(s, "llm_providers", "gemini,groq")
+
+
 @pytest.fixture
 def engine():
     eng = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)

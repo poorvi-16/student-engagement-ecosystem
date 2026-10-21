@@ -23,8 +23,7 @@ def test_requires_profile(client):
     assert client.post("/navigator/run", headers=auth(make_token())).status_code == 400
 
 
-def test_fallback_without_api_key(client, user_headers, monkeypatch):
-    monkeypatch.setattr(get_settings(), "anthropic_api_key", "")
+def test_fallback_without_api_key(client, user_headers):
     body = client.post("/navigator/run", headers=user_headers).json()
     assert body["ai"] is False and body["notice"]
     ms = body["matches"]
@@ -61,7 +60,7 @@ def test_ai_path_and_cache(client, user_headers, monkeypatch):
 
 def test_limits(engine, monkeypatch):
     s = get_settings()
-    monkeypatch.setattr(s, "anthropic_api_key", "test-key")
+    monkeypatch.setattr(s, "gemini_api_key", "test-key")
     monkeypatch.setattr(s, "daily_llm_limit", 2)
     monkeypatch.setattr(s, "monthly_llm_budget", 1.0)
     with Session(engine) as session:
@@ -88,8 +87,7 @@ def test_cost_calculation():
     assert llm.cost_usd("claude-sonnet-5-5", usage) == pytest.approx(12.0)
 
 
-def test_shortlist_and_journey_stage(client, user_headers, monkeypatch):
-    monkeypatch.setattr(get_settings(), "anthropic_api_key", "")
+def test_shortlist_and_journey_stage(client, user_headers):
     cid = client.post("/navigator/run", headers=user_headers).json()["matches"][0]["course_id"]
     assert client.post(f"/navigator/shortlist/{cid}", headers=user_headers).json()["shortlist"] == [cid]
     client.post(f"/navigator/shortlist/{cid}", headers=user_headers)  # idempotent

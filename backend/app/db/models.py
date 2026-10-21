@@ -123,3 +123,16 @@ class Shortlist(SQLModel, table=True):
     user_id: uuid.UUID = Field(primary_key=True, foreign_key="user.id")
     course_id: int = Field(primary_key=True)
     created_at: datetime = Field(default_factory=utcnow)
+
+
+class ChatMessage(SQLModel, table=True):
+    """Mentor conversation, one thread per user. Recent turns are sent back to the model as memory."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    role: str  # user | assistant
+    content: str
+    sources: list[dict] = Field(default_factory=list, sa_column=Column(JSON))  # [{ref, title, section, url}]
+    tools: list[str] = Field(default_factory=list, sa_column=Column(JSON))  # tool names used for this answer
+    ai: bool = True  # False = fallback answer built from search results without the LLM
+    created_at: datetime = Field(default_factory=utcnow, index=True)

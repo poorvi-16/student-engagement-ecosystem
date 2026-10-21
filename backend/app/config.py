@@ -16,6 +16,15 @@ class Settings(BaseSettings):
 
     database_url: str = "sqlite:///./local.db"
 
+    # LLM providers, tried in order; providers without a key are skipped (see app/llm.py)
+    llm_providers: str = "gemini,groq"
+    gemini_api_key: str = ""
+    gemini_model_fast: str = "gemini-flash-latest"
+    gemini_model_smart: str = "gemini-flash-latest"
+    groq_api_key: str = ""
+    groq_model_fast: str = "openai/gpt-oss-20b"
+    groq_model_smart: str = "openai/gpt-oss-120b"
+    # Optional paid provider (structured calls only)
     anthropic_api_key: str = ""
     model_smart: str = "claude-sonnet-5-5"
     model_fast: str = "claude-haiku-5-5"
@@ -34,6 +43,10 @@ class Settings(BaseSettings):
     @property
     def admin_email_list(self) -> list[str]:
         return [e.strip().lower() for e in self.admin_emails.split(",") if e.strip()]
+
+    @property
+    def llm_provider_list(self) -> list[str]:
+        return [x.strip().lower() for x in self.llm_providers.split(",") if x.strip()]
 
     @property
     def cors_origins(self) -> list[str]:

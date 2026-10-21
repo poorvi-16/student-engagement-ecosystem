@@ -1,4 +1,4 @@
-"""AI Career Navigator: deterministic matching + ranking, Claude explains the picks.
+"""AI Career Navigator: deterministic matching + ranking, the LLM explains the picks.
 
 Numbers (chance, cost, salary, payback) are always computed here; the LLM only writes the
 "why this fits you" text. If the LLM is unavailable, template explanations are used.
@@ -80,25 +80,29 @@ def candidate_courses(p: StudentProfile) -> list[tuple[Course, University]]:
     return out
 
 
-def build_matches(p: StudentProfile) -> list[Match]:
+def make_match(p: StudentProfile, c: Course, u: University) -> Match:
+    """Scores one program for one student. Shared by the navigator and the mentor's tools."""
     cat = get_catalog()
-    budget_inr = (p.budget_lakhs or 0) * 1e5
+    total = cat.to_inr(c.tuition_total_local + c.living_total_local, u.currency)
+    salary = cat.to_inr(c.median_salary_local, u.currency)
+    chance = admit_chance(p, c, u)
+    return Match(
+        course_id=c.id, university=u.name, country=u.country, city=u.city, tier=u.tier, qs_rank=u.qs_rank,
+        program=c.program, field=c.field, exact_field=c.field == p.target_field or c.level == "mba",
+        duration_months=c.duration_months, total_cost_lakhs=_lakhs(total),
+        tuition_lakhs=_lakhs(cat.to_inr(c.tuition_total_local, u.currency)),
+        living_lakhs=_lakhs(cat.to_inr(c.living_total_local, u.currency)),
+        salary_lakhs=_lakhs(salary), payback_years=round(total / (salary * SAVINGS_RATE), 1),
+        funding_gap_lakhs=_lakhs(max(0.0, total - (p.budget_lakhs or 0) * 1e5)), chance=chance, bucket=bucket(chance),
+        deadline_month=c.deadline_month, stem=c.stem,
+    )
+
+
+def build_matches(p: StudentProfile) -> list[Match]:
     scored: list[tuple[float, Match]] = []
     for c, u in candidate_courses(p):
-        total = cat.to_inr(c.tuition_total_local + c.living_total_local, u.currency)
-        salary = cat.to_inr(c.median_salary_local, u.currency)
-        chance = admit_chance(p, c, u)
-        m = Match(
-            course_id=c.id, university=u.name, country=u.country, city=u.city, tier=u.tier, qs_rank=u.qs_rank,
-            program=c.program, field=c.field, exact_field=c.field == p.target_field or c.level == "mba",
-            duration_months=c.duration_months, total_cost_lakhs=_lakhs(total),
-            tuition_lakhs=_lakhs(cat.to_inr(c.tuition_total_local, u.currency)),
-            living_lakhs=_lakhs(cat.to_inr(c.living_total_local, u.currency)),
-            salary_lakhs=_lakhs(salary), payback_years=round(total / (salary * SAVINGS_RATE), 1),
-            funding_gap_lakhs=_lakhs(max(0.0, total - budget_inr)), chance=chance, bucket=bucket(chance),
-            deadline_month=c.deadline_month, stem=c.stem,
-        )
-        value = TIER_WEIGHT[u.tier] * (salary / total) * (1.0 if m.exact_field else 0.85)
+        m = make_match(p, c, u)
+        value = TIER_WEIGHT[u.tier] * (m.salary_lakhs / m.total_cost_lakhs) * (1.0 if m.exact_field else 0.85)
         scored.append((value, m))
     scored.sort(key=lambda t: t[0], reverse=True)
 
