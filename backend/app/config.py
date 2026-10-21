@@ -19,11 +19,14 @@ class Settings(BaseSettings):
     # LLM providers, tried in order; providers without a key are skipped (see app/llm.py)
     llm_providers: str = "gemini,groq"
     gemini_api_key: str = ""
-    gemini_model_fast: str = "gemini-flash-latest"
-    gemini_model_smart: str = "gemini-flash-latest"
+    # Comma-separated fallback lists: each model has its own free-tier quota (~5 req/min on Gemini)
+    gemini_model_fast: str = "gemini-flash-lite-latest,gemini-3.5-flash"
+    gemini_model_smart: str = "gemini-3.5-flash,gemini-flash-lite-latest"
+    gemini_reasoning_effort: str = "minimal"  # ~2.5s vs ~6s at "low"; every listed model must accept it
     groq_api_key: str = ""
-    groq_model_fast: str = "openai/gpt-oss-20b"
-    groq_model_smart: str = "openai/gpt-oss-120b"
+    groq_model_fast: str = "openai/gpt-oss-20b,openai/gpt-oss-120b"
+    groq_model_smart: str = "openai/gpt-oss-120b,openai/gpt-oss-20b"
+    groq_reasoning_effort: str = "low"  # gpt-oss supports low | medium | high
     # Optional paid provider (structured calls only)
     anthropic_api_key: str = ""
     model_smart: str = "claude-sonnet-5-5"

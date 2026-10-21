@@ -1,8 +1,9 @@
 """Single entry point for every LLM call.
 
 Providers are tried in the order of `LLM_PROVIDERS` (default "gemini,groq"; both have free tiers and
-speak the OpenAI-compatible chat API). A provider without a key is skipped; a rate-limited or failing
-provider falls through to the next one. `anthropic` is an optional paid provider for structured calls.
+speak the OpenAI-compatible chat API), and within a provider each model in the tier's comma-separated
+list (free-tier quotas are per model, e.g. Gemini allows ~5 requests/min per model). A provider without
+a key is skipped; a rate-limited or failing model falls through to the next one. `anthropic` is an optional paid provider for structured calls.
 
 Enforces the per-user daily call limit and the global monthly budget, and records every call in
 `llmusage`. Callers catch `LLMUnavailable` and fall back to non-AI output, so the app keeps working
@@ -73,19 +74,20 @@ class _ProviderError(Exception):
 class Provider:
     name: str
     key: str
-    fast: str
+    fast: str  # comma-separated models, tried in order (free-tier quotas are per model)
     smart: str
+    reasoning: str = ""  # OpenAI-compatible reasoning_effort; "" = provider default
 
-    def model(self, tier: Tier) -> str:
-        return self.fast if tier == "fast" else self.smart
+    def models(self, tier: Tier) -> list[str]:
+        return [m.strip() for m in (self.fast if tier == "fast" else self.smart).split(",") if m.strip()]
 
 
 def providers() -> list[Provider]:
     """Configured providers that have a key, in priority order."""
     s = get_settings()
     known = {
-        "gemini": Provider("gemini", s.gemini_api_key, s.gemini_model_fast, s.gemini_model_smart),
-        "groq": Provider("groq", s.groq_api_key, s.groq_model_fast, s.groq_model_smart),
+        "gemini": Provider("gemini", s.gemini_api_key, s.gemini_model_fast, s.gemini_model_smart, s.gemini_reasoning_effort),
+        "groq": Provider("groq", s.groq_api_key, s.groq_model_fast, s.groq_model_smart, s.groq_reasoning_effort),
         "anthropic": Provider("anthropic", s.anthropic_api_key, s.model_fast, s.model_smart),
     }
     return [known[n] for n in s.llm_provider_list if n in known and known[n].key]
@@ -93,7 +95,8 @@ def providers() -> list[Provider]:
 
 @lru_cache
 def _http() -> httpx.Client:
-    return httpx.Client(timeout=60.0)
+    # Short timeouts: a hung free-tier endpoint should fail over quickly rather than keep the user waiting
+    return httpx.Client(timeout=httpx.Timeout(30.0, connect=10.0))
 
 
 @lru_cache
@@ -152,6 +155,8 @@ def _unavailable(last: _ProviderError | None) -> LLMUnavailable:
 # ---------- OpenAI-compatible providers (Gemini, Groq) ----------
 
 def _complete(prov: Provider, payload: dict) -> dict:
+    if prov.reasoning:
+        payload = {**payload, "reasoning_effort": prov.reasoning}
     try:
         r = _http().post(
             f"{OPENAI_COMPAT_URLS[prov.name]}/chat/completions",
@@ -181,13 +186,11 @@ def _strip_fences(text: str) -> str:
     return (m.group(1) if m else text).strip()
 
 
-def _parse_openai(session, user, prov: Provider, *, feature, system, prompt, output: type[T], tier, max_tokens) -> T:
-    model = prov.model(tier)
+def _parse_openai(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens) -> T:
     schema = json.dumps(output.model_json_schema(), ensure_ascii=False)
     data = _complete(prov, {
         "model": model,
         "max_tokens": max_tokens,
-        "reasoning_effort": "low",
         "response_format": {"type": "json_object"},
         "messages": [
             {"role": "system", "content": f"{system}\n\nRespond with only a JSON object that matches this JSON Schema:\n{schema}"},
@@ -208,8 +211,7 @@ def _parse_openai(session, user, prov: Provider, *, feature, system, prompt, out
 
 # ---------- Anthropic (optional, paid) ----------
 
-def _parse_anthropic(session, user, prov: Provider, *, feature, system, prompt, output: type[T], tier, max_tokens) -> T:
-    model = prov.model(tier)
+def _parse_anthropic(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens) -> T:
     try:
         response = _anthropic().messages.parse(
             model=model,
@@ -254,11 +256,13 @@ def parse(
     last: _ProviderError | None = None
     for prov in providers():
         fn = _parse_anthropic if prov.name == "anthropic" else _parse_openai
-        try:
-            return fn(session, user, prov, feature=feature, system=system, prompt=prompt, output=output,
-                      tier=tier, max_tokens=max_tokens)
-        except _ProviderError as e:
-            last = e
+        for model in prov.models(tier):
+            try:
+                return fn(session, user, prov, model, feature=feature, system=system, prompt=prompt, output=output,
+                          max_tokens=max_tokens)
+            except _ProviderError as e:
+                log.warning("parse via %s/%s failed (%s), trying next", prov.name, model, e.reason)
+                last = e
     raise _unavailable(last)
 
 
@@ -269,13 +273,14 @@ class ChatResult:
     tool_calls: list[dict[str, Any]] = field(default_factory=list)  # [{"name", "args"}] in call order
 
 
-def _chat_loop(session, user, prov: Provider, *, feature, system, messages, tools, run_tool, tier, max_rounds,
+def _chat_loop(session, user, prov: Provider, model: str, *, feature, system, messages, tools, run_tool, max_rounds,
                max_tokens) -> ChatResult:
-    model = prov.model(tier)
     msgs: list[dict] = [{"role": "system", "content": system}, *messages]
     trace: list[dict] = []
-    for round_no in range(max_rounds + 1):
-        payload: dict[str, Any] = {"model": model, "max_tokens": max_tokens, "reasoning_effort": "low", "messages": msgs}
+    retried_empty = False
+    round_no = 0
+    while round_no <= max_rounds:
+        payload: dict[str, Any] = {"model": model, "max_tokens": max_tokens, "messages": msgs}
         if tools:
             payload["tools"] = tools
             payload["tool_choice"] = "auto" if round_no < max_rounds else "none"  # last round must answer
@@ -286,9 +291,12 @@ def _chat_loop(session, user, prov: Provider, *, feature, system, messages, tool
         calls = msg.get("tool_calls") or []
         if not calls:
             text = (msg.get("content") or "").strip()
-            if not text:
+            if text:
+                return ChatResult(text=text, provider=prov.name, tool_calls=trace)
+            if retried_empty:  # gpt-oss occasionally returns only reasoning; retry the same round once
                 raise _ProviderError("incomplete")
-            return ChatResult(text=text, provider=prov.name, tool_calls=trace)
+            retried_empty = True
+            continue
 
         # Echo the assistant turn back unchanged apart from provider-only fields (Gemini needs its
         # thought signatures inside tool_calls; Groq rejects its own "reasoning" field).
@@ -303,6 +311,7 @@ def _chat_loop(session, user, prov: Provider, *, feature, system, messages, tool
                 args, result = {}, {"error": f"Tool failed: {e}"}
             trace.append({"name": name, "args": args})
             msgs.append({"role": "tool", "tool_call_id": tc.get("id", ""), "content": json.dumps(result, ensure_ascii=False, default=str)})
+        round_no += 1
     raise _ProviderError("incomplete")
 
 
@@ -320,16 +329,17 @@ def chat(
     max_tokens: int = 2000,
 ) -> ChatResult:
     """Multi-turn chat with optional tool use (OpenAI tool schema). `messages` are prior user/assistant
-    turns plus the new user message. Each provider runs the whole turn; on failure the next one restarts it."""
+    turns plus the new user message. Each provider/model runs the whole turn; on failure the next one restarts it."""
     check_limits(session, user)
     last: _ProviderError | None = None
     for prov in providers():
         if prov.name not in OPENAI_COMPAT_URLS:
             continue  # anthropic: structured calls only
-        try:
-            return _chat_loop(session, user, prov, feature=feature, system=system, messages=messages, tools=tools,
-                              run_tool=run_tool, tier=tier, max_rounds=max_rounds, max_tokens=max_tokens)
-        except _ProviderError as e:
-            log.warning("chat via %s failed (%s), trying next provider", prov.name, e.reason)
-            last = e
+        for model in prov.models(tier):
+            try:
+                return _chat_loop(session, user, prov, model, feature=feature, system=system, messages=messages,
+                                  tools=tools, run_tool=run_tool, max_rounds=max_rounds, max_tokens=max_tokens)
+            except _ProviderError as e:
+                log.warning("chat via %s/%s failed (%s), trying next", prov.name, model, e.reason)
+                last = e
     raise _unavailable(last)

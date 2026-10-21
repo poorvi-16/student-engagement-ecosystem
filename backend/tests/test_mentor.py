@@ -51,8 +51,9 @@ def test_ai_answer_with_tools_and_citations(client, user_headers, monkeypatch):
     def fake_chat(session, user, *, run_tool, messages, **kw):
         hits = run_tool("search_knowledge", {"query": "UK graduate route"})
         progs = run_tool("find_programs", {"country": "USA"})
-        assert hits[0]["id"] == "S1" and progs["programs"]
-        assert messages[-1] == {"role": "user", "content": "Can I work in the UK after my master's?"}
+        assert hits[0]["id"].startswith("S") and progs["programs"]
+        last = messages[-1]["content"]  # question + pre-retrieved passages S1..S3
+        assert last.startswith("Can I work in the UK after my master's?") and '"id": "S1"' in last
         return llm.ChatResult(text="Yes, via the Graduate Route [S1]. Ignore [S99].", provider="gemini",
                               tool_calls=[{"name": "search_knowledge", "args": {}}, {"name": "find_programs", "args": {}}])
 
@@ -86,6 +87,9 @@ def test_find_programs_by_university(engine):
     assert out["programs"] and all("Carnegie" in x["university"] for x in out["programs"])
     assert {x["program"] for x in out["programs"]} and all(0 < x["admit_chance_pct"] < 100 for x in out["programs"])
     assert mentor.find_programs(p, university="Hogwarts")["programs"] == []
+    by_label = mentor.find_programs(p, university="Carnegie", field="Computer Science")["programs"]
+    assert by_label and by_label == mentor.find_programs(p, university="Carnegie", field="computer_science")["programs"]
+    assert mentor.find_programs(p, university="Carnegie", field="Underwater Basketry")["programs"]  # falls back
     assert "error" in mentor.find_programs(None)
 
 
@@ -100,3 +104,7 @@ def test_history_isolated_and_clearable(client, user_headers):
 def test_message_validation(client, user_headers):
     assert client.post("/mentor/chat", json={"message": ""}, headers=user_headers).status_code == 422
     assert client.post("/mentor/chat", json={"message": "x" * 1001}, headers=user_headers).status_code == 422
+
+
+def test_normalize_fullwidth_citations():
+    assert mentor.normalize_citations("Fee is X【S1】 and Y【S2†L3-L5】, **bold**") == "Fee is X[S1] and Y[S2], bold"

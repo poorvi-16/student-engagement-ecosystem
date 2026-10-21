@@ -70,7 +70,9 @@ def test_parse_falls_back_to_groq_on_rate_limit(engine, keys, monkeypatch):
         session.commit()
         out = llm.parse(session, u, feature="test", system="Rate it.", prompt="hi", output=Answer)
         assert out == Answer(verdict="ok", score=7)
-        assert [c[0] for c in calls] == ["gemini", "groq"]
+        # both Gemini models (separate per-model quotas) are tried before Groq
+        assert [c[0] for c in calls] == ["gemini", "gemini", "groq"]
+        assert calls[0][1]["model"] != calls[1][1]["model"]
         rows = session.exec(select(LlmUsage)).all()
         assert len(rows) == 1 and rows[0].model.startswith("groq/") and rows[0].cost_usd == 0
 
@@ -133,3 +135,12 @@ def test_chat_all_providers_down(engine, keys, monkeypatch):
     with Session(engine) as session, pytest.raises(llm.LLMUnavailable) as e:
         llm.chat(session, None, feature="mentor", system="s", messages=[{"role": "user", "content": "q"}])
     assert e.value.reason == "api_error"
+
+
+def test_chat_retries_empty_answer_once(engine, keys, monkeypatch):
+    replies = iter([completion(""), completion("Second try works.")])
+    calls = fake_http(monkeypatch, lambda provider, payload: next(replies))
+    with Session(engine) as session:
+        res = llm.chat(session, None, feature="mentor", system="s", messages=[{"role": "user", "content": "q"}])
+    assert res.text == "Second try works." and [c[0] for c in calls] == ["gemini", "gemini"]
+    assert calls[0][1]["reasoning_effort"] == "minimal"

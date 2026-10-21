@@ -21,20 +21,23 @@ from app.services.navigator import MONTHS, _profile_brief, build_matches, make_m
 
 HISTORY_TURNS = 10  # past messages sent to the model as memory
 MAX_PROGRAMS = 6
+FULLWIDTH_CITE_RE = re.compile(r"【([^】]*)】")  # gpt-oss style: 【S1】 or 【S1†L2】
 CITATION_RE = re.compile(r"\s*\[S\d+(?:\s*,\s*S\d+)*\]")
 
 SYSTEM = """You are PathPilot Mentor, a friendly and honest guide for Indian students planning postgraduate study abroad or in India and how to fund it. Today is {today}.
 
 Tools:
+- Guide passages relevant to the question are usually attached to it already. Use them first; call search_knowledge only if they don't cover the question.
 - search_knowledge: PathPilot's guides on visas, post-study work, tests, SOPs/LORs, application timelines, scholarships, costs, education loans, documents, Section 80E/TCS, and study in India. Write specific keyword queries (e.g. "UK graduate route post-study work"). Search again with different words if results are off-topic.
 - find_programs: admit chance, total cost, expected salary and payback for programs in PathPilot's catalogue, filtered by university, country or field. Call it with no arguments for this student's best matches.
 
 Rules:
-- For any fact about rules, fees, amounts, tests, deadlines, loans or scholarships, call search_knowledge first and cite the result id in square brackets right after the sentence, like [S1]. Never invent figures, dates or rules. If the guides don't cover something, say so and suggest the official website.
-- For chances, costs, salaries or payback, call find_programs and use its numbers exactly. Admit chances are estimates, not guarantees.
+- For any fact about rules, fees, amounts, tests, deadlines, loans or scholarships, call search_knowledge first and cite the result id in square brackets right after the sentence, like [S1]. Only cite ids returned by search_knowledge.
+- State only what the search results or tool outputs say; don't add outside figures, limits, dates or lender names. If the guides don't cover something, say so and suggest the official website.
+- For chances, costs, salaries or payback, call find_programs and use its numbers exactly (no citation needed). Admit chances are estimates, not guarantees.
 - Never decide loan eligibility, approve loans or quote specific interest rates. Explain how lenders assess loans and point to PathPilot's loan planner; final decisions are made by the lender after a credit review.
 - Personalise with the student profile below. Mention a relevant gap (e.g. missing test score) when it matters.
-- Keep answers under 170 words: plain text, short paragraphs or lines starting with "- ", no headings, tables or bold. Use ₹ lakhs (L) for Indian amounts.
+- Keep answers under 170 words: plain text, short paragraphs or lines starting with "- ", no headings, tables, bold or asterisks. Use ₹ lakhs (L) for Indian amounts.
 - End with one concrete next step when useful.
 - Only help with higher education, careers and study finance. Politely decline anything else.
 
@@ -78,9 +81,9 @@ class TurnContext:
     profile: StudentProfile | None
     refs: dict[str, Chunk] = field(default_factory=dict)
 
-    def search(self, query: str) -> list[dict]:
+    def search(self, query: str, k: int = 4) -> list[dict]:
         out = []
-        for chunk, _ in get_kb().search(query, k=4):
+        for chunk, _ in get_kb().search(query, k=k):
             ref = next((r for r, c in self.refs.items() if c.id == chunk.id), None)
             if ref is None:
                 ref = f"S{len(self.refs) + 1}"
@@ -89,24 +92,41 @@ class TurnContext:
         return out or [{"note": "No matching guide. Try other keywords or tell the student to check the official website."}]
 
 
+def _field_key(field: str | None) -> str | None:
+    """Accepts a key ("computer_science") or a label ("Computer Science") from the model."""
+    if not field:
+        return None
+    labels = {v.lower(): k for k, v in get_catalog().meta["fields"].items()}
+    f = field.strip().lower()
+    return labels.get(f, f.replace(" ", "_").replace("-", "_"))
+
+
+def _catalog_rows(university: str | None, country: str | None, field: str | None) -> list:
+    cat = get_catalog()
+    rows = []
+    for c in cat.courses:
+        u = cat.universities[c.university_id]
+        if university and university.lower() not in u.name.lower():
+            continue
+        if country and country.lower() != u.country.lower():
+            continue
+        if field and field != c.field:
+            continue
+        rows.append((c, u))
+    return rows
+
+
 def find_programs(p: StudentProfile | None, university: str | None = None, country: str | None = None,
                   field: str | None = None) -> dict:
     if p is None:
         return {"error": "The student hasn't completed the onboarding quiz, so chances can't be estimated yet."}
-    cat = get_catalog()
+    field = _field_key(field)
     if not (university or country or field):
         matches = build_matches(p)[:MAX_PROGRAMS]
     else:
-        rows = []
-        for c in cat.courses:
-            u = cat.universities[c.university_id]
-            if university and university.lower() not in u.name.lower():
-                continue
-            if country and country.lower() != u.country.lower():
-                continue
-            if field and field.lower() != c.field:
-                continue
-            rows.append((c, u))
+        rows = _catalog_rows(university, country, field)
+        if not rows and university and field:  # wrong field guess: show what that university offers
+            rows = _catalog_rows(university, country, None)
         if university and not field:  # prefer the student's own field at that university
             own = [(c, u) for c, u in rows if c.field == p.target_field or (p.target_level == "mba" and c.level == "mba")]
             rows = own or rows
@@ -127,6 +147,11 @@ def find_programs(p: StudentProfile | None, university: str | None = None, count
         ],
         "note": "Indicative figures from PathPilot's models.",
     }
+
+
+def normalize_citations(text: str) -> str:
+    text = FULLWIDTH_CITE_RE.sub(lambda m: "[" + re.sub(r"†[^,\]]*", "", m.group(1)) + "]", text)
+    return text.replace("**", "")
 
 
 def _cited_sources(text: str, refs: dict[str, Chunk]) -> list[dict]:
@@ -180,13 +205,16 @@ def answer(session: Session, user: User, question: str) -> tuple[ChatMessage, st
     )
     # Old citation ids belong to old turns' search results; drop them so the model doesn't reuse them
     messages = [{"role": m.role, "content": CITATION_RE.sub("", m.content)} for m in past]
-    messages.append({"role": "user", "content": question})
+    # Pre-retrieve guide passages so most answers need a single LLM request (free tiers limit requests/min)
+    passages = ctx.search(question, k=3)
+    attached = json.dumps(passages, ensure_ascii=False)
+    messages.append({"role": "user", "content": f"{question}\n\n<guide_passages>\n{attached}\n</guide_passages>"})
     notice = None
     try:
         result = llm.chat(session, user, feature="mentor", system=system, messages=messages, tools=TOOLS,
                           run_tool=run_tool, tier="smart")
-        reply = ChatMessage(user_id=user.id, role="assistant", content=result.text,
-                            sources=_cited_sources(result.text, ctx.refs),
+        text = normalize_citations(result.text)
+        reply = ChatMessage(user_id=user.id, role="assistant", content=text, sources=_cited_sources(text, ctx.refs),
                             tools=list(dict.fromkeys(t["name"] for t in result.tool_calls)), ai=True)
     except llm.LLMUnavailable as e:
         notice = e.user_message
