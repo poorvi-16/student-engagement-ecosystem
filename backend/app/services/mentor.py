@@ -17,7 +17,9 @@ from app import llm
 from app.catalog import get_catalog
 from app.db.models import ChatMessage, StudentProfile, User
 from app.rag.kb import Chunk, get_kb
-from app.services.navigator import MONTHS, _profile_brief, build_matches, make_match
+from app.rules.roi import RoiAssumptions
+from app.services import programs
+from app.services.navigator import MONTHS, _profile_brief, build_matches, make_matches
 
 HISTORY_TURNS = 10  # past messages sent to the model as memory
 MAX_PROGRAMS = 6
@@ -30,11 +32,12 @@ Tools:
 - Guide passages relevant to the question are usually attached to it already. Use them first; call search_knowledge only if they don't cover the question.
 - search_knowledge: PathPilot's guides on visas, post-study work, tests, SOPs/LORs, application timelines, scholarships, costs, education loans, documents, Section 80E/TCS, and study in India. Write specific keyword queries (e.g. "UK graduate route post-study work"). Search again with different words if results are off-topic.
 - find_programs: admit chance, total cost, expected salary and payback for programs in PathPilot's catalogue, filtered by university, country or field. Call it with no arguments for this student's best matches.
+- analyze_program: one program in depth (needs a course_id from find_programs): what drives the admit chance, which score improvements help most, "what if" chances with different scores, and ROI (cost, funding gap, indicative EMI, payback, India-vs-abroad comparison).
 
 Rules:
 - For any fact about rules, fees, amounts, tests, deadlines, loans or scholarships, call search_knowledge first and cite the result id in square brackets right after the sentence, like [S1]. Only cite ids returned by search_knowledge.
 - State only what the search results or tool outputs say; don't add outside figures, limits, dates or lender names. If the guides don't cover something, say so and suggest the official website.
-- For chances, costs, salaries or payback, call find_programs and use its numbers exactly (no citation needed). Admit chances are estimates, not guarantees.
+- For chances, costs, salaries or payback, call find_programs (and analyze_program for "what if", ROI or EMI questions) and use their numbers exactly (no citation needed). Admit chances are estimates, not guarantees.
 - Never decide loan eligibility, approve loans or quote specific interest rates. Explain how lenders assess loans and point to PathPilot's loan planner; final decisions are made by the lender after a credit review.
 - Personalise with the student profile below. Mention a relevant gap (e.g. missing test score) when it matters.
 - Keep answers under 170 words: plain text, short paragraphs or lines starting with "- ", no headings, tables, bold or asterisks. Use ₹ lakhs (L) for Indian amounts.
@@ -42,6 +45,10 @@ Rules:
 - Only help with higher education, careers and study finance. Politely decline anything else.
 
 Student profile (JSON): {profile}"""
+
+WHAT_IF_FIELDS = ("cgpa", "gre", "gmat", "ielts", "toefl", "entrance_percentile", "work_exp_months")
+WHAT_IF_RANGES = {"cgpa": (4, 10), "gre": (260, 340), "gmat": (200, 800), "ielts": (4, 9), "toefl": (0, 120),
+                  "entrance_percentile": (0, 100), "work_exp_months": (0, 240)}
 
 TOOLS = [
     {
@@ -68,6 +75,28 @@ TOOLS = [
                     "country": {"type": "string", "description": "One of: USA, UK, Canada, Germany, Australia, Ireland, Netherlands, India"},
                     "field": {"type": "string", "description": "Field key, e.g. computer_science, data_science, mba, finance"},
                 },
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "analyze_program",
+            "description": "Deep-dive one program for this student: admit-chance factors, best score improvements, what-if chance with "
+                           "hypothetical scores, and ROI (₹ lakhs: cost, funding gap, indicative EMI, payback, India-vs-abroad).",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "course_id": {"type": "integer", "description": "From find_programs"},
+                    "what_if": {
+                        "type": "object",
+                        "description": "Hypothetical scores to test, e.g. {\"gre\": 330}",
+                        "properties": {k: {"type": "number"} for k in WHAT_IF_FIELDS},
+                    },
+                    "scholarship_lakhs": {"type": "number"},
+                    "work_in": {"type": "string", "enum": ["abroad", "india"], "description": "Where they work after graduating"},
+                },
+                "required": ["course_id"],
             },
         },
     },
@@ -130,7 +159,7 @@ def find_programs(p: StudentProfile | None, university: str | None = None, count
         if university and not field:  # prefer the student's own field at that university
             own = [(c, u) for c, u in rows if c.field == p.target_field or (p.target_level == "mba" and c.level == "mba")]
             rows = own or rows
-        matches = [make_match(p, c, u) for c, u in rows]
+        matches = make_matches(p, rows)
         matches.sort(key=lambda m: (m.university, -m.chance))
         matches = matches[:MAX_PROGRAMS]
     if not matches:
@@ -146,6 +175,48 @@ def find_programs(p: StudentProfile | None, university: str | None = None, count
             for m in matches
         ],
         "note": "Indicative figures from PathPilot's models.",
+    }
+
+
+def analyze_program(p: StudentProfile | None, course_id, what_if: dict | None = None,
+                    scholarship_lakhs: float | None = None, work_in: str | None = None) -> dict:
+    if p is None:
+        return {"error": "The student hasn't completed the onboarding quiz yet."}
+    try:
+        prog = programs.get_program(int(course_id))
+    except (TypeError, ValueError):
+        prog = None
+    if prog is None:
+        return {"error": "Unknown course_id. Call find_programs first to get one."}
+    c, u = prog
+    overrides = {}
+    for k, v in (what_if or {}).items():
+        if k in WHAT_IF_RANGES and isinstance(v, (int, float)):
+            lo, hi = WHAT_IF_RANGES[k]
+            overrides[k] = max(lo, min(hi, v))
+    admit = programs.admit_view(p, c, u, overrides)
+    a = RoiAssumptions(scholarship_lakhs=max(0.0, float(scholarship_lakhs or 0)),
+                       work_in="india" if work_in == "india" else "abroad")
+    rois = programs.roi_with_alternative(p, c, u, a)
+
+    def roi_brief(r: dict) -> dict:
+        return {"total_cost_lakhs": r["cost"]["total_lakhs"], "funding_gap_lakhs": r["funding"]["gap_lakhs"],
+                "indicative_emi_lakhs_per_month": r["loan"]["emi_lakhs"], "emi_pct_of_salary": r["loan"]["emi_pct_of_salary"],
+                "starting_salary_lakhs": r["salary"]["start_lakhs"], "works_in": r["salary"]["location"],
+                "payback_years": r["outcome"]["payback_years"] or "over 10", "ten_year_net_gain_lakhs": r["outcome"]["ten_year_net_lakhs"]}
+
+    alt = rois["alternative"]
+    return {
+        "program": f"{c.program}, {u.name} ({u.country})",
+        "admit_chance_pct": round(admit["chance"] * 100),
+        **({"what_if": overrides, "current_chance_pct": round(admit["baseline_chance"] * 100)} if overrides else {}),
+        "factors": [f"{f['factor']}: yours {f['yours']} vs typical admit {f['typical']} ({f['impact_pct']:+d} pts)"
+                    for f in admit["factors"][:3]],
+        "best_improvements": [f"{lv['label']}: {lv['delta_pct']:+d} pts" for lv in admit["levers"][:3]],
+        "roi": roi_brief(rois["roi"]),
+        **({"comparison": {"program": f"{alt['program']['program']}, {alt['program']['university']}",
+                           "admit_chance_pct": round(alt["chance"] * 100), **roi_brief(alt["roi"])}} if alt else {}),
+        "note": "Indicative figures from PathPilot's models; EMI uses an illustrative 11% rate, not a loan offer.",
     }
 
 
@@ -197,6 +268,9 @@ def answer(session: Session, user: User, question: str) -> tuple[ChatMessage, st
             return ctx.search(str(args.get("query", "")))
         if name == "find_programs":
             return find_programs(p, args.get("university"), args.get("country"), args.get("field"))
+        if name == "analyze_program":
+            return analyze_program(p, args.get("course_id"), args.get("what_if"), args.get("scholarship_lakhs"),
+                                   args.get("work_in"))
         return {"error": f"Unknown tool {name}"}
 
     system = SYSTEM.format(

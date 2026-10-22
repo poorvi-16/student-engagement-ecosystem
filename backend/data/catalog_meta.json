@@ -10,37 +10,46 @@
   "countries": {
     "USA": {
       "currency": "USD",
-      "living_per_year_local": 20000
+      "living_per_year_local": 20000,
+      "one_time_lakhs": 2.5
     },
     "UK": {
       "currency": "GBP",
-      "living_per_year_local": 15000
+      "living_per_year_local": 15000,
+      "one_time_lakhs": 2.5
     },
     "Canada": {
       "currency": "CAD",
-      "living_per_year_local": 20000
+      "living_per_year_local": 20000,
+      "one_time_lakhs": 2.5
     },
     "Germany": {
       "currency": "EUR",
-      "living_per_year_local": 12000
+      "living_per_year_local": 12000,
+      "one_time_lakhs": 1.5
     },
     "Ireland": {
       "currency": "EUR",
-      "living_per_year_local": 15000
+      "living_per_year_local": 15000,
+      "one_time_lakhs": 1.8
     },
     "Australia": {
       "currency": "AUD",
-      "living_per_year_local": 28000
+      "living_per_year_local": 28000,
+      "one_time_lakhs": 3.0
     },
     "Netherlands": {
       "currency": "EUR",
-      "living_per_year_local": 14000
+      "living_per_year_local": 14000,
+      "one_time_lakhs": 1.8
     },
     "India": {
       "currency": "INR",
-      "living_per_year_local": 150000
+      "living_per_year_local": 150000,
+      "one_time_lakhs": 0.3
     }
   },
+  "one_time_note": "Visa and health-surcharge/insurance fees, flights, deposits and test fees (indicative).",
   "fields": {
     "computer_science": "Computer Science",
     "data_science": "Data Science",

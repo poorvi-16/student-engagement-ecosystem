@@ -95,10 +95,21 @@ export default function DashboardPage() {
                   </p>
                   <p className="mt-2 text-xs font-medium text-amber-600">+30 XP on first chat</p>
                 </Link>
-                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 sm:col-span-2 dark:border-gray-700">
+                <Link
+                  href="/navigator"
+                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                >
+                  <p className="text-2xl">🎯</p>
+                  <h2 className="mt-2 font-semibold">Admit odds &amp; ROI</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Open any program for what-if sliders on your scores, total cost, EMI, payback and an India-vs-abroad comparison.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">+20 XP what-if · +20 XP ROI</p>
+                </Link>
+                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 dark:border-gray-700">
                   <p className="text-2xl">🔒</p>
                   <h2 className="mt-2 font-semibold">More tools coming</h2>
-                  <p className="text-sm">Admission predictor, ROI calculator, timeline and loan planner unlock next.</p>
+                  <p className="text-sm">Application timeline, SOP reviewer, visa mock interview and loan planner unlock next.</p>
                 </div>
               </section>
             ) : (

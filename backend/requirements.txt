@@ -8,3 +8,6 @@ alembic>=1.14
 psycopg[binary]>=3.2
 pyjwt[crypto]>=2.10
 anthropic>=1.15
+# Pinned: the committed admit-model .pkl must be loaded by the same scikit-learn/numpy it was trained with
+scikit-learn==1.9.1
+numpy==2.5.4

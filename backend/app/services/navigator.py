@@ -15,11 +15,12 @@ from sqlmodel import Session, select
 from app import llm
 from app.catalog import Course, University, get_catalog
 from app.db.models import AiCache, StudentProfile, User
-from app.ml.admit import admit_chance, bucket
+from app.ml.admit import admit_chances, bucket
+from app.ml.features import Applicant
+from app.rules.roi import RoiAssumptions, compute_roi
 
 PROMPT_VERSION = "nav-v1"
 PER_BUCKET = 4
-SAVINGS_RATE = 0.35  # share of post-study salary assumed available to recover costs
 
 RELATED_FIELDS = {
     "computer_science": ["data_science"],
@@ -51,7 +52,7 @@ class Match:
     tuition_lakhs: float
     living_lakhs: float
     salary_lakhs: float
-    payback_years: float
+    payback_years: float | None  # None = not recovered within 10 years
     funding_gap_lakhs: float
     chance: float
     bucket: str
@@ -59,10 +60,6 @@ class Match:
     stem: bool
     why: str = ""
     watch_out: str = ""
-
-
-def _lakhs(inr: float) -> float:
-    return round(inr / 1e5, 1)
 
 
 def candidate_courses(p: StudentProfile) -> list[tuple[Course, University]]:
@@ -80,29 +77,35 @@ def candidate_courses(p: StudentProfile) -> list[tuple[Course, University]]:
     return out
 
 
-def make_match(p: StudentProfile, c: Course, u: University) -> Match:
-    """Scores one program for one student. Shared by the navigator and the mentor's tools."""
-    cat = get_catalog()
-    total = cat.to_inr(c.tuition_total_local + c.living_total_local, u.currency)
-    salary = cat.to_inr(c.median_salary_local, u.currency)
-    chance = admit_chance(p, c, u)
+def make_match(p: StudentProfile, c: Course, u: University, chance: float | None = None) -> Match:
+    """Scores one program for one student with default ROI assumptions, so cards match the program page.
+
+    Shared by the navigator and the mentor's tools. Pass `chance` when it was already batch-predicted.
+    """
+    if chance is None:
+        chance = admit_chances(Applicant.from_profile(p), [(c, u)])[0]
+    roi = compute_roi(c, u, RoiAssumptions(), p.budget_lakhs or 0)
     return Match(
         course_id=c.id, university=u.name, country=u.country, city=u.city, tier=u.tier, qs_rank=u.qs_rank,
         program=c.program, field=c.field, exact_field=c.field == p.target_field or c.level == "mba",
-        duration_months=c.duration_months, total_cost_lakhs=_lakhs(total),
-        tuition_lakhs=_lakhs(cat.to_inr(c.tuition_total_local, u.currency)),
-        living_lakhs=_lakhs(cat.to_inr(c.living_total_local, u.currency)),
-        salary_lakhs=_lakhs(salary), payback_years=round(total / (salary * SAVINGS_RATE), 1),
-        funding_gap_lakhs=_lakhs(max(0.0, total - (p.budget_lakhs or 0) * 1e5)), chance=chance, bucket=bucket(chance),
+        duration_months=c.duration_months, total_cost_lakhs=roi["cost"]["total_lakhs"],
+        tuition_lakhs=roi["cost"]["tuition_lakhs"], living_lakhs=roi["cost"]["living_lakhs"],
+        salary_lakhs=roi["salary"]["start_lakhs"], payback_years=roi["outcome"]["payback_years"],
+        funding_gap_lakhs=roi["funding"]["gap_lakhs"], chance=chance, bucket=bucket(chance),
         deadline_month=c.deadline_month, stem=c.stem,
     )
 
 
+def make_matches(p: StudentProfile, programs: list[tuple[Course, University]]) -> list[Match]:
+    """make_match for many programs with one batched admit-model call."""
+    chances = admit_chances(Applicant.from_profile(p), programs)
+    return [make_match(p, c, u, ch) for (c, u), ch in zip(programs, chances)]
+
+
 def build_matches(p: StudentProfile) -> list[Match]:
     scored: list[tuple[float, Match]] = []
-    for c, u in candidate_courses(p):
-        m = make_match(p, c, u)
-        value = TIER_WEIGHT[u.tier] * (m.salary_lakhs / m.total_cost_lakhs) * (1.0 if m.exact_field else 0.85)
+    for m in make_matches(p, candidate_courses(p)):
+        value = TIER_WEIGHT[m.tier] * (m.salary_lakhs / m.total_cost_lakhs) * (1.0 if m.exact_field else 0.85)
         scored.append((value, m))
     scored.sort(key=lambda t: t[0], reverse=True)
 
@@ -136,9 +139,10 @@ MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", 
 def template_explanations(p: StudentProfile, matches: list[Match]) -> str:
     for m in matches:
         label = {"ambitious": "A reach", "target": "A realistic fit", "safe": "A strong-odds option"}[m.bucket]
+        payback = f"pays back in ~{m.payback_years:g} years" if m.payback_years else "takes over 10 years to pay back"
         m.why = (
             f"{label} for your profile at about {round(m.chance * 100)}% estimated odds; graduates earn ~₹{m.salary_lakhs:g}L/yr, "
-            f"so the ₹{m.total_cost_lakhs:g}L cost pays back in ~{m.payback_years:g} years."
+            f"so the ₹{m.total_cost_lakhs:g}L cost {payback}."
         )
         if m.funding_gap_lakhs > 0:
             m.watch_out = f"You'd need ~₹{m.funding_gap_lakhs:g}L beyond your budget; an education loan can cover this."

@@ -16,15 +16,16 @@ random.seed(42)
 FX = {"USD": 88.0, "GBP": 115.0, "CAD": 64.0, "EUR": 100.0, "AUD": 58.0, "INR": 1.0}
 
 COUNTRIES = {
-    # currency, annual living cost (local), typical MS duration (months), MBA duration, deadline month for fall/main intake
-    "USA": {"currency": "USD", "living": 20000, "ms_months": 24, "mba_months": 24, "deadline_month": 12},
-    "UK": {"currency": "GBP", "living": 15000, "ms_months": 12, "mba_months": 12, "deadline_month": 2},
-    "Canada": {"currency": "CAD", "living": 20000, "ms_months": 20, "mba_months": 20, "deadline_month": 1},
-    "Germany": {"currency": "EUR", "living": 12000, "ms_months": 24, "mba_months": 18, "deadline_month": 5},
-    "Ireland": {"currency": "EUR", "living": 15000, "ms_months": 12, "mba_months": 12, "deadline_month": 3},
-    "Australia": {"currency": "AUD", "living": 28000, "ms_months": 24, "mba_months": 24, "deadline_month": 10},
-    "Netherlands": {"currency": "EUR", "living": 14000, "ms_months": 18, "mba_months": 12, "deadline_month": 2},
-    "India": {"currency": "INR", "living": 150000, "ms_months": 24, "mba_months": 24, "deadline_month": 11},
+    # currency, annual living cost (local), typical MS duration (months), MBA duration, deadline month for fall/main intake,
+    # one-time costs in ₹ lakhs (visa + health surcharge/insurance, flights, deposits, test fees)
+    "USA": {"currency": "USD", "living": 20000, "ms_months": 24, "mba_months": 24, "deadline_month": 12, "one_time_lakhs": 2.5},
+    "UK": {"currency": "GBP", "living": 15000, "ms_months": 12, "mba_months": 12, "deadline_month": 2, "one_time_lakhs": 2.5},
+    "Canada": {"currency": "CAD", "living": 20000, "ms_months": 20, "mba_months": 20, "deadline_month": 1, "one_time_lakhs": 2.5},
+    "Germany": {"currency": "EUR", "living": 12000, "ms_months": 24, "mba_months": 18, "deadline_month": 5, "one_time_lakhs": 1.5},
+    "Ireland": {"currency": "EUR", "living": 15000, "ms_months": 12, "mba_months": 12, "deadline_month": 3, "one_time_lakhs": 1.8},
+    "Australia": {"currency": "AUD", "living": 28000, "ms_months": 24, "mba_months": 24, "deadline_month": 10, "one_time_lakhs": 3.0},
+    "Netherlands": {"currency": "EUR", "living": 14000, "ms_months": 18, "mba_months": 12, "deadline_month": 2, "one_time_lakhs": 1.8},
+    "India": {"currency": "INR", "living": 150000, "ms_months": 24, "mba_months": 24, "deadline_month": 11, "one_time_lakhs": 0.3},
 }
 
 # Median starting salary (local currency) by field
@@ -207,11 +208,15 @@ def main() -> None:
 
     meta = {
         "fx_inr": FX,
-        "countries": {k: {"currency": v["currency"], "living_per_year_local": v["living"]} for k, v in COUNTRIES.items()},
+        "countries": {
+            k: {"currency": v["currency"], "living_per_year_local": v["living"], "one_time_lakhs": v["one_time_lakhs"]}
+            for k, v in COUNTRIES.items()
+        },
+        "one_time_note": "Visa and health-surcharge/insurance fees, flights, deposits and test fees (indicative).",
         "fields": {k: FIELD_NAMES[k].replace("MS ", "").replace("Master of ", "") for k in FIELD_NAMES},
         "disclaimer": "Indicative estimates for a prototype. Verify fees, deadlines and salaries on official sources.",
     }
-    (OUT / "catalog_meta.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+    (OUT / "catalog_meta.json").write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     print(f"{len(uni_rows)} universities, {len(course_rows)} courses")
 
 

@@ -1,0 +1,97 @@
+{
+  "features": [
+    "base_logit",
+    "cgpa_gap",
+    "test_gap",
+    "test_missing",
+    "english_gap",
+    "english_missing",
+    "work_years",
+    "work_shortfall_years",
+    "college_tier",
+    "uni_tier",
+    "is_india",
+    "is_mba"
+  ],
+  "version": "admit-v1",
+  "algorithm": "HistGradientBoostingClassifier (monotonic constraints)",
+  "rows": 173600,
+  "programs": 434,
+  "per_program": 400,
+  "metrics": {
+    "model": {
+      "auc": 0.83,
+      "brier": 0.1344,
+      "log_loss": 0.4191
+    },
+    "logistic_regression": {
+      "auc": 0.8196,
+      "brier": 0.1376,
+      "log_loss": 0.4288
+    },
+    "oracle": {
+      "auc": 0.8569,
+      "brier": 0.1239,
+      "log_loss": 0.3893
+    },
+    "heuristic": {
+      "auc": 0.8257,
+      "brier": 0.1374,
+      "log_loss": 0.4272
+    }
+  },
+  "calibration": [
+    {
+      "predicted": 0.015,
+      "actual": 0.019,
+      "n": 3480
+    },
+    {
+      "predicted": 0.036,
+      "actual": 0.036,
+      "n": 3479
+    },
+    {
+      "predicted": 0.061,
+      "actual": 0.06,
+      "n": 3481
+    },
+    {
+      "predicted": 0.095,
+      "actual": 0.111,
+      "n": 3480
+    },
+    {
+      "predicted": 0.136,
+      "actual": 0.146,
+      "n": 3480
+    },
+    {
+      "predicted": 0.188,
+      "actual": 0.207,
+      "n": 3480
+    },
+    {
+      "predicted": 0.26,
+      "actual": 0.268,
+      "n": 3480
+    },
+    {
+      "predicted": 0.369,
+      "actual": 0.37,
+      "n": 3480
+    },
+    {
+      "predicted": 0.526,
+      "actual": 0.532,
+      "n": 3480
+    },
+    {
+      "predicted": 0.78,
+      "actual": 0.764,
+      "n": 3480
+    }
+  ],
+  "sklearn": "1.9.1",
+  "trained_at": "2026-10-22T15:35:36+00:00"
+}

@@ -20,6 +20,7 @@ type Message = {
 const TOOL_LABELS: Record<string, string> = {
   search_knowledge: "🔎 Searched guides",
   find_programs: "🎓 Checked programs",
+  analyze_program: "📊 Ran odds & ROI",
 };
 
 /** Renders plain text with "- " bullets and turns [S1] / [S1, S2] into links to the cited source. */
@@ -137,6 +138,12 @@ export default function MentorPage() {
       })
       .catch((e) => setError(e instanceof ApiError ? e.message : String(e)));
   }, [me]);
+
+  // Other pages can open the mentor with a question ready to send: /mentor?q=...
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) setInput(q.slice(0, 1000));
+  }, []);
 
   useEffect(() => {
     bottom.current?.scrollIntoView({ behavior: "smooth" });

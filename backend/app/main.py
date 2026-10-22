@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import catalog, me, mentor, navigator
+from app.api import catalog, me, mentor, navigator, programs
 from app.config import get_settings
+from app.ml.admit import load_model, model_info
 
 settings = get_settings()
 
@@ -21,8 +22,11 @@ app.include_router(me.router)
 app.include_router(catalog.router)
 app.include_router(navigator.router)
 app.include_router(mentor.router)
+app.include_router(programs.router)
+
+load_model()  # load the admit model at startup rather than on the first request
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "environment": settings.environment}
+    return {"status": "ok", "environment": settings.environment, "admit_model": model_info()["version"]}

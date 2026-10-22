@@ -18,7 +18,7 @@ type Match = {
   tuition_lakhs: number;
   living_lakhs: number;
   salary_lakhs: number;
-  payback_years: number;
+  payback_years: number | null;
   funding_gap_lakhs: number;
   chance: number;
   bucket: "ambitious" | "target" | "safe";
@@ -77,7 +77,7 @@ function MatchCard({ m, starred, onStar }: { m: Match; starred: boolean; onStar:
         <Stat label="Admit odds" value={`${Math.round(m.chance * 100)}%`} />
         <Stat label="Total cost" value={`₹${m.total_cost_lakhs}L`} />
         <Stat label="Median salary" value={`₹${m.salary_lakhs}L/yr`} />
-        <Stat label="Payback" value={`~${m.payback_years} yrs`} />
+        <Stat label="Payback" value={m.payback_years == null ? "10+ yrs" : `~${m.payback_years} yrs`} />
       </dl>
 
       <p className="text-sm">{m.why}</p>
@@ -90,6 +90,13 @@ function MatchCard({ m, starred, onStar }: { m: Match; starred: boolean; onStar:
         <span>Deadline ~{MONTHS[m.deadline_month - 1]}</span>
         {m.funding_gap_lakhs > 0 && <span className="text-indigo-600 dark:text-indigo-400">Funding gap ₹{m.funding_gap_lakhs}L</span>}
       </div>
+
+      <Link
+        href={`/programs/${m.course_id}`}
+        className="mt-auto rounded-lg border border-indigo-200 px-3 py-2 text-center text-sm font-medium text-indigo-700 hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-950"
+      >
+        What-if odds &amp; ROI →
+      </Link>
     </article>
   );
 }
@@ -197,7 +204,7 @@ export default function NavigatorPage() {
           })}
 
           <p className="text-xs text-gray-500">
-            {result.disclaimer} Admit odds are estimates from our model, not guarantees. Payback assumes 35% of salary goes to recovering costs.
+            {result.disclaimer} Admit odds are estimates from our model, not guarantees. Costs include living, visa/flights and a rupee buffer; payback assumes 35% of salary goes to recovering the cost plus loan interest.
           </p>
         </>
       )}
