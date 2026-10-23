@@ -21,6 +21,7 @@ const TOOL_LABELS: Record<string, string> = {
   search_knowledge: "🔎 Searched guides",
   find_programs: "🎓 Checked programs",
   analyze_program: "📊 Ran odds & ROI",
+  estimate_loan: "💰 Checked loan offers",
 };
 
 /** Renders plain text with "- " bullets and turns [S1] / [S1, S2] into links to the cited source. */

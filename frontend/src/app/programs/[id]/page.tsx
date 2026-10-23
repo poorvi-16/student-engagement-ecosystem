@@ -554,12 +554,20 @@ function RoiPanel({ courseId, detail }: { courseId: string; detail: Detail }) {
               EMI starts after a {roi.loan.moratorium_months}-month moratorium. Collateral and co-applicant income change what lenders offer.
             </p>
           </div>
-          <Link
-            href={`/mentor?q=${encodeURIComponent(`How can I fund the ${lakhs(roi.funding.gap_lakhs)} gap for ${detail.program.program} at ${detail.program.university}? Do I need collateral?`)}`}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
-          >
-            Ask the mentor about funding
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/loan?course=${detail.program.course_id}`}
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+            >
+              See loan offers →
+            </Link>
+            <Link
+              href={`/mentor?q=${encodeURIComponent(`How can I fund the ${lakhs(roi.funding.gap_lakhs)} gap for ${detail.program.program} at ${detail.program.university}? Do I need collateral?`)}`}
+              className="rounded-lg border border-indigo-300 px-4 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100 dark:border-indigo-800 dark:text-indigo-200 dark:hover:bg-indigo-900"
+            >
+              Ask the mentor
+            </Link>
+          </div>
         </div>
       )}
       <p className="text-[11px] text-gray-500">{detail.roi_note}</p>

@@ -10,6 +10,7 @@ Enforces the per-user daily call limit and the global monthly budget, and record
 without keys, over the limit, or when every free tier is busy.
 """
 
+import base64
 import json
 import logging
 import re
@@ -38,6 +39,8 @@ PRICES = {
     "claude-haiku-5-5": (0.10, 0.50, 0.01, 0.125),
     "claude-sonnet-5-5": (2.00, 10.00, 0.20, 2.50),
 }
+
+VISION_PROVIDERS = {"gemini", "anthropic"}  # Groq's gpt-oss models are text-only
 
 OPENAI_COMPAT_URLS = {
     "gemini": "https://generativelanguage.googleapis.com/v1beta/openai",
@@ -186,15 +189,19 @@ def _strip_fences(text: str) -> str:
     return (m.group(1) if m else text).strip()
 
 
-def _parse_openai(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens) -> T:
+def _parse_openai(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens,
+                  images=None) -> T:
     schema = json.dumps(output.model_json_schema(), ensure_ascii=False)
+    content = prompt if not images else [{"type": "text", "text": prompt}] + [
+        {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{base64.b64encode(raw).decode()}"}} for mime, raw in images
+    ]
     data = _complete(prov, {
         "model": model,
         "max_tokens": max_tokens,
         "response_format": {"type": "json_object"},
         "messages": [
             {"role": "system", "content": f"{system}\n\nRespond with only a JSON object that matches this JSON Schema:\n{schema}"},
-            {"role": "user", "content": prompt},
+            {"role": "user", "content": content},
         ],
     })
     _record_openai(session, user, feature, prov, model, data)
@@ -211,14 +218,19 @@ def _parse_openai(session, user, prov: Provider, model: str, *, feature, system,
 
 # ---------- Anthropic (optional, paid) ----------
 
-def _parse_anthropic(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens) -> T:
+def _parse_anthropic(session, user, prov: Provider, model: str, *, feature, system, prompt, output: type[T], max_tokens,
+                     images=None) -> T:
+    content = prompt if not images else [
+        {"type": "image", "source": {"type": "base64", "media_type": mime, "data": base64.b64encode(raw).decode()}}
+        for mime, raw in images
+    ] + [{"type": "text", "text": prompt}]
     try:
         response = _anthropic().messages.parse(
             model=model,
             max_tokens=max_tokens,
             # Static instructions first + cached; per-user data goes in the user turn
             system=[{"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}],
-            messages=[{"role": "user", "content": prompt}],
+            messages=[{"role": "user", "content": content}],
             output_config={"effort": "low"},
             output_format=output,
         )
@@ -250,16 +262,22 @@ def parse(
     output: type[T],
     tier: Tier = "fast",
     max_tokens: int = 8000,
+    images: list[tuple[str, bytes]] | None = None,
 ) -> T:
-    """Structured-output call: returns a validated `output` instance or raises LLMUnavailable."""
+    """Structured-output call: returns a validated `output` instance or raises LLMUnavailable.
+
+    `images` = [(mime_type, bytes)] for vision (document extraction); only VISION_PROVIDERS are tried then.
+    """
     check_limits(session, user)
     last: _ProviderError | None = None
     for prov in providers():
+        if images and prov.name not in VISION_PROVIDERS:
+            continue
         fn = _parse_anthropic if prov.name == "anthropic" else _parse_openai
         for model in prov.models(tier):
             try:
                 return fn(session, user, prov, model, feature=feature, system=system, prompt=prompt, output=output,
-                          max_tokens=max_tokens)
+                          max_tokens=max_tokens, images=images)
             except _ProviderError as e:
                 log.warning("parse via %s/%s failed (%s), trying next", prov.name, model, e.reason)
                 last = e

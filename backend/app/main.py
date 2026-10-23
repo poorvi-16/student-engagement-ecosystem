@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import catalog, me, mentor, navigator, programs, sop, timeline, visa
+from app.api import catalog, loan, me, mentor, navigator, programs, sop, timeline, visa
 from app.config import get_settings
 from app.ml.admit import load_model, model_info
 
@@ -26,6 +26,7 @@ app.include_router(programs.router)
 app.include_router(timeline.router)
 app.include_router(sop.router)
 app.include_router(visa.router)
+app.include_router(loan.router)
 
 load_model()  # load the admit model at startup rather than on the first request
 

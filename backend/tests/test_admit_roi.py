@@ -150,4 +150,16 @@ def test_mentor_analyze_program_tool():
     assert out["admit_chance_pct"] >= out["current_chance_pct"]
     assert out["roi"]["funding_gap_lakhs"] > 0 and out["comparison"]["works_in"] == "India"
     assert "error" in mentor.analyze_program(p, "nope") and "error" in mentor.analyze_program(None, 1)
-    assert {t["function"]["name"] for t in mentor.TOOLS} == {"search_knowledge", "find_programs", "analyze_program"}
+    assert {t["function"]["name"] for t in mentor.TOOLS} == {"search_knowledge", "find_programs", "analyze_program", "estimate_loan"}
+
+
+def test_mentor_estimate_loan_tool():
+    from app.db.models import StudentProfile
+    p = StudentProfile(user_id="00000000-0000-0000-0000-0000000000de", target_level="masters", target_field="computer_science",
+                       target_countries=["USA"], cgpa=8.5, gre=320, college_tier=2, budget_lakhs=20, co_applicant_income_lpa=12)
+    out = mentor.estimate_loan(p, 1)
+    assert out["amount_requested_lakhs"] == out["funding_gap_lakhs"] and len(out["offers"]) == 4
+    assert any(o["eligible"] and o["emi_rupees"] > 0 for o in out["offers"])
+    secured = mentor.estimate_loan(p, 1, collateral_value_lakhs=500)
+    assert any(o["type"] == "secured" and o["eligible"] for o in secured["offers"])
+    assert "error" in mentor.estimate_loan(p, "x")

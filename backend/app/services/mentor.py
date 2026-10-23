@@ -18,7 +18,7 @@ from app.catalog import get_catalog
 from app.db.models import ChatMessage, StudentProfile, User
 from app.rag.kb import Chunk, get_kb
 from app.rules.roi import RoiAssumptions
-from app.services import programs, timeline
+from app.services import loan, programs, timeline
 from app.services.navigator import MONTHS, _profile_brief, build_matches, make_matches
 
 HISTORY_TURNS = 10  # past messages sent to the model as memory
@@ -32,13 +32,14 @@ Tools:
 - Guide passages relevant to the question are usually attached to it already. Use them first; call search_knowledge only if they don't cover the question.
 - search_knowledge: PathPilot's guides on visas, post-study work, tests, SOPs/LORs, application timelines, scholarships, costs, education loans, documents, Section 80E/TCS, and study in India. Write specific keyword queries (e.g. "UK graduate route post-study work"). Search again with different words if results are off-topic.
 - find_programs: admit chance, total cost, expected salary and payback for programs in PathPilot's catalogue, filtered by university, country or field. Call it with no arguments for this student's best matches.
+- estimate_loan: soft loan eligibility and offers from PathPilot's simulated lenders for a course_id (amount defaults to the ROI funding gap): eligibility reasons, amount, rate, APR, EMI, collateral needs.
 - analyze_program: one program in depth (needs a course_id from find_programs): what drives the admit chance, which score improvements help most, "what if" chances with different scores, and ROI (cost, funding gap, indicative EMI, payback, India-vs-abroad comparison).
 
 Rules:
 - For any fact about rules, fees, amounts, tests, deadlines, loans or scholarships, call search_knowledge first and cite the result id in square brackets right after the sentence, like [S1]. Only cite ids returned by search_knowledge.
 - State only what the search results or tool outputs say; don't add outside figures, limits, dates or lender names. If the guides don't cover something, say so and suggest the official website.
 - For chances, costs, salaries or payback, call find_programs (and analyze_program for "what if", ROI or EMI questions) and use their numbers exactly (no citation needed). Admit chances are estimates, not guarantees.
-- Never decide loan eligibility, approve loans or quote specific interest rates. Explain how lenders assess loans and point to PathPilot's loan planner; final decisions are made by the lender after a credit review.
+- For loan questions about a specific program, call estimate_loan and quote its indicative numbers, saying they're simulated estimates. Never promise approval or invent rates; final decisions are made by the lender after a credit review. Point to PathPilot's loan planner (/loan) to compare offers and apply.
 - Personalise with the student profile below. Mention a relevant gap (e.g. missing test score) when it matters.
 - Keep answers under 170 words: plain text, short paragraphs or lines starting with "- ", no headings, tables, bold or asterisks. Use ₹ lakhs (L) for Indian amounts.
 - End with one concrete next step when useful.
@@ -96,6 +97,23 @@ TOOLS = [
                     },
                     "scholarship_lakhs": {"type": "number"},
                     "work_in": {"type": "string", "enum": ["abroad", "india"], "description": "Where they work after graduating"},
+                },
+                "required": ["course_id"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "estimate_loan",
+            "description": "Soft (no credit check) loan eligibility and indicative offers from simulated lenders for one program.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "course_id": {"type": "integer", "description": "From find_programs"},
+                    "amount_lakhs": {"type": "number", "description": "Loan amount; omit to use the funding gap"},
+                    "collateral_value_lakhs": {"type": "number", "description": "Property/FD value if the student mentions it"},
+                    "co_applicant_income_lpa": {"type": "number"},
                 },
                 "required": ["course_id"],
             },
@@ -221,6 +239,40 @@ def analyze_program(p: StudentProfile | None, course_id, what_if: dict | None = 
     }
 
 
+def _num(v, lo: float, hi: float) -> float | None:
+    return max(lo, min(hi, float(v))) if isinstance(v, (int, float)) else None
+
+
+def estimate_loan(p: StudentProfile | None, course_id, amount_lakhs=None, collateral_value_lakhs=None,
+                  co_applicant_income_lpa=None) -> dict:
+    if p is None:
+        return {"error": "The student hasn't completed the onboarding quiz yet."}
+    try:
+        prog = programs.get_program(int(course_id))
+    except (TypeError, ValueError):
+        prog = None
+    if prog is None:
+        return {"error": "Unknown course_id. Call find_programs first to get one."}
+    case, roi = loan.build_case(p, *prog, amount_lakhs=_num(amount_lakhs, 1, 300),
+                                collateral_value_lakhs=_num(collateral_value_lakhs, 0, 2000),
+                                co_applicant_income_lpa=_num(co_applicant_income_lpa, 0, 500))
+    view = loan.offers_view(case, roi)
+    return {
+        "program": f"{prog[0].program}, {prog[1].name}",
+        "amount_requested_lakhs": case.amount_lakhs, "funding_gap_lakhs": view["need"]["gap_lakhs"],
+        "co_applicant_income_lpa": case.co_applicant_income_lpa, "collateral_lakhs": case.collateral_value_lakhs,
+        "offers": [
+            {"lender": o["lender"], "type": o["type"], "eligible": o["eligible"],
+             **({"amount_lakhs": o["amount_lakhs"], "rate_pct": o["rate_pct"], "apr_pct": o["apr_pct"],
+                 "emi_rupees": round(o["emi_lakhs"] * 1e5), "moratorium_months": o["moratorium_months"]}
+                if o["eligible"] else {"why_not": o["reasons"][:2]})}
+            for o in view["offers"]
+        ],
+        "covered_lakhs": view["covered_lakhs"], "tips": view["tips"][:2],
+        "note": "Simulated lenders, soft estimate: no credit check; real sanction needs documents and a human credit review.",
+    }
+
+
 def normalize_citations(text: str) -> str:
     text = FULLWIDTH_CITE_RE.sub(lambda m: "[" + re.sub(r"†[^,\]]*", "", m.group(1)) + "]", text)
     return text.replace("**", "")
@@ -269,6 +321,9 @@ def answer(session: Session, user: User, question: str) -> tuple[ChatMessage, st
             return ctx.search(str(args.get("query", "")))
         if name == "find_programs":
             return find_programs(p, args.get("university"), args.get("country"), args.get("field"))
+        if name == "estimate_loan":
+            return estimate_loan(p, args.get("course_id"), args.get("amount_lakhs"), args.get("collateral_value_lakhs"),
+                                 args.get("co_applicant_income_lpa"))
         if name == "analyze_program":
             return analyze_program(p, args.get("course_id"), args.get("what_if"), args.get("scholarship_lakhs"),
                                    args.get("work_in"))

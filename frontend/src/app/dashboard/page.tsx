@@ -139,11 +139,17 @@ export default function DashboardPage() {
                   </p>
                   <p className="mt-2 text-xs font-medium text-amber-600">+50 XP on your first full interview</p>
                 </Link>
-                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 sm:col-span-2 dark:border-gray-700">
-                  <p className="text-2xl">🔒</p>
-                  <h2 className="mt-2 font-semibold">Loan planner coming next</h2>
-                  <p className="text-sm">Eligibility, offers from simulated lenders, EMI planning and a guided loan application.</p>
-                </div>
+                <Link
+                  href="/loan"
+                  className="rounded-xl border-2 border-indigo-200 bg-indigo-50/50 p-5 transition hover:border-indigo-400 hover:shadow-sm sm:col-span-2 dark:border-indigo-900 dark:bg-indigo-950/30"
+                >
+                  <p className="text-2xl">💰</p>
+                  <h2 className="mt-2 font-semibold">Education loan planner</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Soft eligibility check (no credit score impact), offers from simulated lenders, EMI &amp; moratorium planner with Section 80E savings.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">+30 XP estimate · +20 XP EMI plan</p>
+                </Link>
               </section>
             ) : (
               <section className="rounded-xl border-2 border-dashed border-indigo-300 p-6 text-center dark:border-indigo-800">
