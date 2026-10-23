@@ -56,7 +56,8 @@ def test_plan_order_and_rules():
     assert not any(k.startswith("test:gre") or k.startswith("test:english") for k in keys)  # scores already in profile
     order = {k: i for i, k in enumerate(keys)}
     assert order["sop:draft"] < order["sop:review"] < order["sop:final"]
-    assert order["finance:apply"] < order["finance:sanction"] < order["visa:usa:4"]  # sanction letter before the interview
+    assert order["finance:apply"] < order["finance:sanction"] < order["visa:usa:3"]  # sanction letter before the interview
+    assert order["visa:usa:2"] < order["visa:practice"] < order["visa:usa:3"]
     assert order["decide:accept"] < order["visa:usa:1"]
 
     no_scores, _ = build_plan(_profile(gre=None, ielts=None), progs, TODAY)

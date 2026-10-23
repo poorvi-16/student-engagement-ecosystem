@@ -54,7 +54,7 @@ const CATEGORY: Record<string, { label: string; icon: string }> = {
 const TOOL_LINKS: [RegExp, string, string][] = [
   [/^research:/, "/navigator", "Open Navigator"],
   [/^sop:review/, "/sop", "Open SOP reviewer"],
-  [/^visa:usa:3/, "/visa", "Start mock interview"],
+  [/^visa:practice/, "/visa", "Start mock interview"],
   [/^finance:estimate/, "/navigator", "See funding gaps"],
 ];
 

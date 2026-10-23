@@ -128,10 +128,21 @@ export default function DashboardPage() {
                   </p>
                   <p className="mt-2 text-xs font-medium text-amber-600">+40 XP on first review</p>
                 </Link>
-                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 dark:border-gray-700">
+                <Link
+                  href="/visa"
+                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                >
+                  <p className="text-2xl">🛂</p>
+                  <h2 className="mt-2 font-semibold">Visa mock interview</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Practise with an AI visa officer (US, UK, Canada, Germany, Australia) and get coached after every answer.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">+50 XP on your first full interview</p>
+                </Link>
+                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 sm:col-span-2 dark:border-gray-700">
                   <p className="text-2xl">🔒</p>
-                  <h2 className="mt-2 font-semibold">More tools coming</h2>
-                  <p className="text-sm">Visa mock interview and the loan planner unlock next.</p>
+                  <h2 className="mt-2 font-semibold">Loan planner coming next</h2>
+                  <p className="text-sm">Eligibility, offers from simulated lenders, EMI planning and a guided loan application.</p>
                 </div>
               </section>
             ) : (

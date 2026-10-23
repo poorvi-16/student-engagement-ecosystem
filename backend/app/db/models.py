@@ -185,3 +185,20 @@ class SopSubmission(SQLModel, table=True):
     ai: bool = False
     result: dict = Field(default_factory=dict, sa_column=Column(JSON))  # {"rules": ..., "review": ...}
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class VisaInterview(SQLModel, table=True):
+    """One mock visa interview. `queue` holds the questions still to ask; `turns` the answered ones."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    country: str
+    course_id: int | None = None
+    program_label: str = ""
+    status: str = "active"  # active | done | abandoned
+    queue: list[dict] = Field(default_factory=list, sa_column=Column(JSON))  # [{id, text, follow_up_of?}]
+    turns: list[dict] = Field(default_factory=list, sa_column=Column(JSON))  # [{id, question, answer, rating, ...}]
+    score: int | None = None  # 0-100 readiness when done
+    ai: bool = False
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    finished_at: datetime | None = None

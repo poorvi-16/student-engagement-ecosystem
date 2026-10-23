@@ -23,7 +23,6 @@ START_MONTH = {
 VISA_STEPS = {
     "USA": [(4.0, "Receive your I-20 and pay the SEVIS fee", "Your university issues the I-20 once you accept and show funds; the SEVIS I-901 fee comes before the visa interview."),
             (3.5, "Fill the DS-160 and book your F-1 interview", "Slots in India fill up fast in peak season; book as soon as you have the I-20."),
-            (3.0, "Practise your visa interview", "Run PathPilot's mock visa interview until you can explain your course, funding and plans clearly."),
             (2.5, "Attend your F-1 visa interview", "Carry your I-20, DS-160 confirmation, SEVIS receipt, admit letter, test scores and loan sanction / bank proofs.")],
     "UK": [(3.0, "Receive your CAS from the university", "You need the CAS number before applying; it follows your unconditional offer and deposit."),
            (2.5, "Apply for the UK Student visa and pay the IHS", "Show maintenance funds held for 28 days, plus the Immigration Health Surcharge.")],
@@ -178,8 +177,13 @@ def build_plan(p: StudentProfile, programs: list[tuple[Course, University]], tod
             "finance", sanction)
 
     # Visa and travel
-    for i, (months, title, detail) in enumerate(VISA_STEPS.get(main_country, []), start=1):
+    steps = VISA_STEPS.get(main_country, [])
+    for i, (months, title, detail) in enumerate(steps, start=1):
         add(f"visa:{main_country.lower()}:{i}", title, detail, "visa", _months_before(start, months))
+    if abroad and steps:  # practise just before the final visa step
+        add("visa:practice", "Practise your visa interview",
+            "Run PathPilot's mock visa interview until you can explain your course, funding and plans clearly.",
+            "visa", _months_before(start, min(m for m, _, _ in steps) + 0.4))
     if abroad:
         add("travel:book", "Book flights and accommodation", "Compare university housing with private options; book flights once the visa is approved.",
             "travel", _months_before(start, 1.5))
