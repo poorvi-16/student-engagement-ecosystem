@@ -170,3 +170,18 @@ class TimelineTask(SQLModel, table=True):
     done: bool = False
     done_at: datetime | None = None
     xp_awarded: bool = False
+
+
+class SopSubmission(SQLModel, table=True):
+    """An SOP the student had reviewed: the text plus rule checks and the AI review (in `result`)."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    course_id: int | None = None
+    program_label: str = "General"
+    text: str
+    word_count: int = 0
+    score: int = 0  # AI overall score, or the rule score when the AI was unavailable
+    ai: bool = False
+    result: dict = Field(default_factory=dict, sa_column=Column(JSON))  # {"rules": ..., "review": ...}
+    created_at: datetime = Field(default_factory=utcnow, index=True)
