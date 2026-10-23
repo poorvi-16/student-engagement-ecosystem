@@ -67,3 +67,16 @@ def admin_user(user: User = Depends(current_user)) -> User:
     if user.role != "admin":
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Admin only")
     return user
+
+
+def optional_user(
+    creds: HTTPAuthorizationCredentials | None = Depends(bearer),
+    session: Session = Depends(get_session),
+) -> User | None:
+    """For public pages that personalise when someone is signed in; an invalid token counts as signed out."""
+    if creds is None:
+        return None
+    try:
+        return current_user(creds, session)
+    except HTTPException:
+        return None

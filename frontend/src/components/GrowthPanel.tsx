@@ -47,6 +47,20 @@ export function GrowthPanel({ onXp }: { onXp?: () => void }) {
             } catch {}
           })
       : Promise.resolve();
+    // Report the campaign this visitor came from (recorded once, used by the admin funnel)
+    let utm: string | null = null;
+    try {
+      utm = localStorage.getItem("pp_utm");
+    } catch {}
+    if (utm) {
+      api("/growth/attribution", { method: "POST", body: utm })
+        .then(() => {
+          try {
+            localStorage.removeItem("pp_utm");
+          } catch {}
+        })
+        .catch(() => {});
+    }
     claim.then(load);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

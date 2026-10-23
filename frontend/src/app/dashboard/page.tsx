@@ -143,6 +143,17 @@ export default function DashboardPage() {
                   <p className="mt-2 text-xs font-medium text-amber-600">+50 XP on your first full interview</p>
                 </Link>
                 <Link
+                  href="/discover"
+                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm sm:col-span-2 dark:border-gray-800"
+                >
+                  <p className="text-2xl">📚</p>
+                  <h2 className="mt-2 font-semibold">Discover</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Guides on visas, tests, costs and funding, picked for your interests and journey stage.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">Read 5 guides for the Bookworm badge</p>
+                </Link>
+                <Link
                   href="/loan"
                   className="rounded-xl border-2 border-indigo-200 bg-indigo-50/50 p-5 transition hover:border-indigo-400 hover:shadow-sm sm:col-span-2 dark:border-indigo-900 dark:bg-indigo-950/30"
                 >

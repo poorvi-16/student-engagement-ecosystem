@@ -271,3 +271,26 @@ class Nudge(SQLModel, table=True):
     source: str = "rules"  # rules | orchestrator (Day 4)
     created_at: datetime = Field(default_factory=utcnow, index=True)
     acted_at: datetime | None = None
+
+
+class ContentPost(SQLModel, table=True):
+    """Marketing content written by the content agent (agents/content.py): blog/guide pages, reel scripts, LinkedIn posts.
+
+    `tags` use the same `country:` / `field:` / `topic:` form as `StudentProfile.interest_tags`, which is how the
+    Discover feed is personalised. Guides are public (SEO pages at /guides/{slug}).
+    """
+
+    id: int | None = Field(default=None, primary_key=True)
+    slug: str = Field(index=True, unique=True)
+    kind: str = Field(default="guide", index=True)  # guide | reel | linkedin
+    topic: str = Field(index=True)  # KB guide slug the post is grounded in
+    title: str
+    summary: str = ""
+    body: str = ""  # restricted Markdown: ## headings, - lists, **bold**
+    tags: list[str] = Field(default_factory=list, sa_column=Column(JSON))
+    sources: list[dict] = Field(default_factory=list, sa_column=Column(JSON))  # [{title, url, reviewed}]
+    ai: bool = False  # False = assembled from the knowledge base without the LLM
+    status: str = Field(default="published", index=True)  # published | hidden
+    views: int = 0
+    run_id: int | None = Field(default=None, index=True)  # AgentRun that published it
+    created_at: datetime = Field(default_factory=utcnow, index=True)

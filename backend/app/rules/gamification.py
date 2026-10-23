@@ -53,6 +53,7 @@ BADGES = [
     Badge("funding_ready", "🏦", "Funding ready", "Submit a loan application", lambda s: _c(s, "loan_application_submitted") > 0),
     Badge("streak_3", "🔥", "On a roll", "Visit 3 days in a row", lambda s: s.streak_days >= 3),
     Badge("streak_7", "⚡", "Unstoppable", "Visit 7 days in a row", lambda s: s.streak_days >= 7),
+    Badge("bookworm", "📚", "Bookworm", "Read 5 guides in Discover", lambda s: _c(s, "content_view") >= 5),
     Badge("connector", "🤝", "Connector", "Invite a friend who completes the quiz", lambda s: s.referrals >= 1),
 ]
 

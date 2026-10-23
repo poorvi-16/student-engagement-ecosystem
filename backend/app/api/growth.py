@@ -28,6 +28,14 @@ class ShareIn(BaseModel):
     enabled: bool
 
 
+class AttributionIn(BaseModel):
+    """Where the visitor came from (UTM tags remembered by the landing pages), recorded once at first login."""
+
+    source: str = Field(default="", max_length=40)
+    medium: str = Field(default="", max_length=40)
+    campaign: str = Field(default="", max_length=80)
+
+
 def _nudge_out(n: Nudge) -> dict:
     return {"id": n.id, "title": n.title, "body": n.body, "cta_label": n.cta_label, "cta_href": n.cta_href, "priority": n.priority}
 
@@ -72,6 +80,14 @@ def claim(body: ReferralIn, user: User = Depends(current_user), session: Session
     ok, message = svc.claim_referral(session, user, body.code)
     session.commit()
     return {"ok": ok, "message": message}
+
+
+@router.post("/growth/attribution")
+def attribution(body: AttributionIn, user: User = Depends(current_user), session: Session = Depends(get_session)) -> dict:
+    if (body.source or body.campaign) and not svc.event_counts(session, user).get("signup_attribution"):
+        log_event(session, user, "signup_attribution", body.model_dump())
+        session.commit()
+    return {"ok": True}
 
 
 @router.post("/growth/share")
