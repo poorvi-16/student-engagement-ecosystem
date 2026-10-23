@@ -28,6 +28,7 @@ class User(SQLModel, table=True):
     streak_days: int = 0
     last_active_date: datetime | None = None
     is_simulated: bool = False  # synthetic cohort users for the growth-loop demo
+    share_card: bool = False  # opt-in public share card at /card/{referral_code}
     created_at: datetime = Field(default_factory=utcnow)
 
 
@@ -243,3 +244,30 @@ class LoanDocument(SQLModel, table=True):
     status: str = "uploaded"  # extracted | manual (AI unavailable) | failed
     created_at: datetime = Field(default_factory=utcnow)
     expires_at: datetime | None = None
+
+
+class UserBadge(SQLModel, table=True):
+    """Badges a student has earned (rules/gamification.py). `seen` drives the "new badge" highlight."""
+
+    user_id: uuid.UUID = Field(primary_key=True, foreign_key="user.id")
+    badge_id: str = Field(primary_key=True)
+    earned_at: datetime = Field(default_factory=utcnow)
+    seen: bool = False
+
+
+class Nudge(SQLModel, table=True):
+    """A nudge shown in-app or sent on a mock channel (rules/nudges.py). `key` de-duplicates per user."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    key: str = Field(index=True)
+    channel: str = "in_app"  # in_app | whatsapp | email (mock)
+    title: str
+    body: str
+    cta_label: str = ""
+    cta_href: str = ""
+    priority: int = 50
+    status: str = "active"  # active | clicked | dismissed | expired | sent
+    source: str = "rules"  # rules | orchestrator (Day 4)
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+    acted_at: datetime | None = None

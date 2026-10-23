@@ -11,6 +11,7 @@ from app.db.models import StudentProfile, User, utcnow
 from app.db.session import get_session
 from app.events import log_event
 from app.rules.profile_strength import compute_profile_strength
+from app.services import growth
 
 router = APIRouter(prefix="/me", tags=["me"])
 
@@ -74,6 +75,13 @@ def _strength(profile: StudentProfile | None) -> StrengthOut | None:
 @router.get("", response_model=MeResponse)
 def get_me(user: User = Depends(current_user), session: Session = Depends(get_session)) -> MeResponse:
     profile = session.get(StudentProfile, user.id)
+    growth.touch(session, user)  # daily streak + visit XP
+    if profile:
+        growth.refresh_profile(session, user, profile)  # journey stage + interest tags from events
+    session.commit()
+    session.refresh(user)
+    if profile:
+        session.refresh(profile)
     return MeResponse(user=user, profile=profile, strength=_strength(profile))
 
 
@@ -108,6 +116,8 @@ def save_profile(body: ProfileIn, user: User = Depends(current_user), session: S
         session, user, "quiz_completed" if is_new else "profile_updated",
         {"profile_strength": profile.profile_strength}, xp=QUIZ_XP if is_new else 0, once=True,
     )
+    if is_new:
+        growth.convert_referral(session, user)  # the friend who invited them gets their reward now
     session.add(user)
     session.commit()
     session.refresh(profile)

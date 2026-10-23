@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { RefCapture } from "@/components/RefCapture";
 
 export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center gap-5 p-6 text-center">
+      <RefCapture />
       <h1 className="text-4xl font-bold sm:text-5xl">PathPilot</h1>
       <p className="max-w-md text-gray-600 dark:text-gray-400">
         Your AI copilot for higher studies — find the right university, plan your applications, and fund your future.

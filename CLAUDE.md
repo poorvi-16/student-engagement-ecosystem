@@ -95,7 +95,15 @@ Submitting needs all required fields and documents, no copilot errors, and 3 con
 
 **Deterministic vs LLM.** Loan eligibility, offers, EMI, and FOIR are **pure rule code** in `rules/` and are unit-tested; never let the LLM compute money or decide eligibility. ML gives scores. The LLM explains, converses, generates content, and extracts documents.
 
-**Growth engine.** Every user action is written to an `events` table. Journey stage (Explorer → Shortlister → Applicant → Admitted → Funding), interest tags, and lead score are derived from events. This drives feed ordering, nudges, and when the loan copilot is triggered. The Growth Orchestrator (scheduled) chains content agent → nudge agent → loan copilot trigger → metrics/A-B feedback. Every agent action is logged to an `agent_runs` table that the admin Agent Console displays. A user simulator generates a synthetic cohort so the loop has data to act on.
+**Growth engine.** Every user action is written to the `event` table, and `services/growth.py` derives everything from it plus current state:
+- **Streaks:** `touch` runs on GET /me; +5 XP per visit day; a gap resets the streak.
+- **Journey stage:** `derive_stage` moves explorer → shortlister (shortlist) → applicant (an `apply:*` task done) → admitted (`decide:accept` done or admit letter uploaded) → funding (loan submitted), and never moves backwards. Interest tags (`country:`/`field:`/`topic:`) are refreshed on /me.
+- **Levels and badges:** levels (`rules/gamification.LEVELS`); 14 badges evaluated from event counts and persisted in `userbadge` (no XP for badges).
+- **Nudges:** `rules/nudges.candidates(State)` returns prioritised next actions, with the loan triggers on top (funding gap → offers → copilot → finish → decision). `refresh_nudges` syncs the `nudge` table on GET /growth: max 3 active, expired when no longer true, 7-day cooldown after click/dismiss. `push_nudges` (daily 10:00 IST via APScheduler) sends one ≥80-priority nudge per opted-in (`consent_marketing`) student every ≤3 days on the mock email/WhatsApp gateway (`mocks/notifications.py`).
+- **Referrals:** `?ref=CODE` on the landing page goes to localStorage, and the dashboard claims it (first week only, not your own code): +50 XP for the referee, then +100 XP for the referrer when the referee completes the quiz.
+- **Share card:** opt-in public card at `/card/{code}` with first name, goals, level and badges only, via GET /public/card/{code} (no auth), plus an OG image for WhatsApp/LinkedIn previews.
+
+The Day 4 Growth Orchestrator chains content agent → nudge agent → loan copilot trigger → metrics/A-B feedback and logs to `agent_runs`; a user simulator generates a synthetic cohort.
 
 ## Rules specific to this project
 - **RLS on every table:** Supabase exposes `public` tables to the anon key via REST. Every new table must get `ENABLE ROW LEVEL SECURITY` (no policies) in its migration — see `migrations/versions/d2a058d4850b_enable_rls_on_app_tables.py`. The backend connects as the owner and bypasses RLS.
@@ -134,5 +142,5 @@ Free-tier note: the Render free instance sleeps when idle, so the first request 
 - [x] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ✅ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
 - [x] **Day 2 – AI modules** (✅ 2.1 RAG + mentor chat with tools/citations, Gemini→Groq · ✅ 2.2 synthetic data + admit model with what-if sliders + ROI calculator · ✅ 2.3 timeline generator · ✅ 2.4 SOP reviewer · ✅ 2.5 visa mock interview)
-- [ ] **Day 3 – Loan funnel + growth**: ✅ 3.1 eligibility rules + dynamic offers + EMI/moratorium planner · ✅ 3.2 loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker · Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.
+- [x] **Day 3 – Loan funnel + growth**: ✅ 3.1 eligibility rules + dynamic offers + EMI/moratorium planner · ✅ 3.2 loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker · ✅ 3.3 journey stage, XP levels/streaks/badges, referral code + share card, nudges
 - [ ] **Day 4 – Bonus loop + ship**: content agent + Discover feed, lead score, growth orchestrator + user simulator, admin Agent Console. Run the pre-share checklist on the live URL, then the solution deck (`deck/`) and demo script.

@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { GrowthPanel } from "@/components/GrowthPanel";
 import { ProfileStrength } from "@/components/ProfileStrength";
 import { supabase } from "@/lib/supabase";
 import { useMe } from "@/lib/useMe";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { me, error, loading } = useMe();
+  const { me, error, loading, reload } = useMe();
 
   async function signOut() {
     await supabase?.auth.signOut();
@@ -55,6 +56,8 @@ export default function DashboardPage() {
                 )}
               </dl>
             </section>
+
+            <GrowthPanel onXp={reload} />
 
             {me.profile && me.strength ? (
               <section className="space-y-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800">

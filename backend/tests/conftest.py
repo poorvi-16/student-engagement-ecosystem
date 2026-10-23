@@ -26,6 +26,13 @@ def no_llm_keys(monkeypatch):
     monkeypatch.setattr(s, "llm_providers", "gemini,groq")
 
 
+@pytest.fixture(autouse=True)
+def no_visit_xp(monkeypatch):
+    """Module tests assert exact XP; the +5 daily-visit XP from GET /me is tested in test_growth.py."""
+    from app.services import growth
+    monkeypatch.setattr(growth, "DAILY_VISIT_XP", 0)
+
+
 @pytest.fixture
 def engine():
     eng = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
