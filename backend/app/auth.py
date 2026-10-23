@@ -60,6 +60,11 @@ def current_user(
         session.add(user)
         session.commit()
         session.refresh(user)
+    elif user.role != "admin" and user.email.lower() in get_settings().admin_email_list:
+        user.role = "admin"  # ADMIN_EMAILS added after the account already existed
+        session.add(user)
+        session.commit()
+        session.refresh(user)
     return user
 
 

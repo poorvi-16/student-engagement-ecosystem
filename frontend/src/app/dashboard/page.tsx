@@ -49,10 +49,10 @@ export default function DashboardPage() {
                   <dd className="text-xl font-semibold">{me.user.streak_days}🔥</dd>
                 </div>
                 {me.user.role === "admin" && (
-                  <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
-                    <dt className="text-xs text-gray-500">Role</dt>
-                    <dd className="text-xl font-semibold">Admin</dd>
-                  </div>
+                  <Link href="/admin" className="rounded-lg bg-indigo-50 px-4 py-2 hover:bg-indigo-100 dark:bg-indigo-950/50">
+                    <dt className="text-xs text-gray-500">Admin</dt>
+                    <dd className="text-xl font-semibold text-indigo-700 dark:text-indigo-300">Console →</dd>
+                  </Link>
                 )}
               </dl>
             </section>

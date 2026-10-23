@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import catalog, content, growth, loan, loan_application, me, mentor, navigator, programs, sop, timeline, visa
+from app.api import admin, catalog, content, growth, loan, loan_application, me, mentor, navigator, programs, sop, timeline, visa
 from app import scheduler, storage
 from app.config import get_settings
 from app.ml import lead
@@ -43,6 +43,7 @@ app.include_router(loan_application.router)
 app.include_router(loan.router)
 app.include_router(growth.router)
 app.include_router(content.router)
+app.include_router(admin.router)
 
 load_model()  # load the ML models at startup rather than on the first request
 lead.load_model()
