@@ -83,6 +83,16 @@ Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, 
 
 Pricing is the product floor plus visible premiums (tier, non-STEM, income band, collateral discount). Simple interest during the moratorium is capitalised; APR is KFS-style (the fee is included, so APR ≥ rate). `schedule()` does year-by-year repayment with optional interest servicing during study, prepayment, and Sec 80E (old regime only, 8 years at 31.2%). `services/loan.build_case` starts the amount from the ROI funding gap. API `/loan`, `/loan/offers` (can save co-applicant income/collateral to the profile), `/loan/plan`. The UI always says soft check / simulated lenders.
 
+**Loan copilot (`/loan/apply`).** There is one active `loanapplication` per student, created from an offer and pre-filled from the profile; re-applying resumes the draft. Documents (`POST /loan/applications/{id}/documents`, multipart, JPG/PNG/WebP/PDF ≤ 5 MB):
+- `services/documents.extract` renders PDFs to JPEG (pypdfium2) and calls `llm.parse(..., images=[...])`, which tries only `VISION_PROVIDERS` (Gemini, Anthropic; Groq is text-only).
+- `rules/loan_docs`:
+  - `clean_extracted` keeps only the Aadhaar's last 4 digits (and passport last 4);
+  - `autofill` fills only empty fields;
+  - `checklist`, `missing` and `cross_checks` give the deterministic "copilot check": PAN format, name vs PAN, admit-letter university, declared vs slip income, passport expiry, age.
+- Files go to the private Supabase Storage bucket `loan-docs` (`app/storage.py`, service-role REST, created on first use); they're viewed only through 5-minute signed URLs and deleted after 30 days by `scheduler.cleanup_documents` (APScheduler, started in the FastAPI lifespan; tests never start it). Aadhaar images are never stored.
+
+Submitting needs all required fields and documents, no copilot errors, and 3 consents (KYC, bureau, DPDP). It then runs `mocks/cibil.pull` (deterministic per PAN; ~70% of students have no history) and `mocks/nbfc_los.submit`, which re-evaluates the offer with document-verified income. The decision is sanctioned, revised or declined, with declined for a co-applicant score below 650. The decision is fixed at submission but revealed by `nbfc_los.status` as time passes (stages at 0/1/2/4/7/10 minutes, ending in "Human credit review" → a provisional, simulated sanction letter). Submitting moves the journey stage to `funding`.
+
 **Deterministic vs LLM.** Loan eligibility, offers, EMI, and FOIR are **pure rule code** in `rules/` and are unit-tested; never let the LLM compute money or decide eligibility. ML gives scores. The LLM explains, converses, generates content, and extracts documents.
 
 **Growth engine.** Every user action is written to an `events` table. Journey stage (Explorer → Shortlister → Applicant → Admitted → Funding), interest tags, and lead score are derived from events. This drives feed ordering, nudges, and when the loan copilot is triggered. The Growth Orchestrator (scheduled) chains content agent → nudge agent → loan copilot trigger → metrics/A-B feedback. Every agent action is logged to an `agent_runs` table that the admin Agent Console displays. A user simulator generates a synthetic cohort so the loop has data to act on.
@@ -90,6 +100,7 @@ Pricing is the product floor plus visible premiums (tier, non-STEM, income band,
 ## Rules specific to this project
 - **RLS on every table:** Supabase exposes `public` tables to the anon key via REST. Every new table must get `ENABLE ROW LEVEL SECURITY` (no policies) in its migration — see `migrations/versions/d2a058d4850b_enable_rls_on_app_tables.py`. The backend connects as the owner and bypasses RLS.
 - **DB connection:** use the Supabase **Session pooler** URL (`postgres.<ref>@aws-…pooler.supabase.com:5432`); the direct `db.<ref>.supabase.co` host is IPv6-only and fails on this machine. Project region is ap-northeast-2 → deploy Render in Singapore.
+- **Memory:** Render free has 512 MB and dev machines may be tight; `OPENBLAS_NUM_THREADS=1` is set in the Dockerfile and tests (numpy/scikit-learn otherwise spawn a thread pool per core).
 - **Env changes need a backend restart:** settings are cached and `--reload` only watches `.py` files.
 - **Local dev ports:** frontend must run on `localhost:3000` (CORS `FRONTEND_ORIGIN`). If Next says the port is in use, kill the stale `next dev` process rather than continuing on 3001. Don't run `npm run build` while `npm run dev` is running: both write `.next/` and the dev server starts returning 500s until it's restarted.
 - **Multi-user and public:** every DB query is scoped by the `user_id` from the verified Supabase JWT. Admin routes require the admin role.
@@ -102,7 +113,7 @@ Pricing is the product floor plus visible premiums (tier, non-STEM, income band,
 Deploy early and continuously. The skeleton goes live on Day 1, and every push to `main` auto-deploys.
 
 1. **GitHub**: push the repo with `.env*` in `.gitignore`. Provide `backend/.env.example` and `frontend/.env.example`.
-2. **Supabase**: create the project, enable Email (magic link) + Google auth, and create a private `loan-docs` bucket. Run `alembic upgrade head` against the Supabase `DATABASE_URL`.
+2. **Supabase**: create the project and enable Email (magic link) + Google auth. The private `loan-docs` bucket is created by the backend on first upload (`/health` shows `storage: true` when the service-role key is set). Run `alembic upgrade head` against the Supabase `DATABASE_URL`.
 3. **Backend on Render**: deployed from `render.yaml` (Blueprint) → Docker service `pathpilot-api`, root `backend/`, region Singapore, free plan, **1 instance**, health check `/health`, auto-deploy on push. `backend/start.sh` runs `alembic upgrade head` before starting uvicorn, so migrations apply on every deploy. Secrets are `sync: false` and entered in the Render dashboard. Commit trained `.pkl` models so the container doesn't need to train.
 4. **Frontend on Vercel**: import the repo with root `frontend/`, and set the `NEXT_PUBLIC_*` vars, with `NEXT_PUBLIC_API_URL` pointing to the Render URL.
 5. **Wire up**: set the backend `FRONTEND_ORIGIN` to the Vercel production URL and `FRONTEND_ORIGIN_REGEX` to match preview URLs (CORS); add the Vercel URL to Supabase Auth → URL Configuration (Site URL + Redirect URLs).
@@ -115,7 +126,7 @@ Deploy early and continuously. The skeleton goes live on Day 1, and every push t
    - sign-up → loan-application has been tested end-to-end on the live URL with 2–3 separate accounts, confirming no data leaks between users.
 8. Share the Vercel link. The in-app feedback button collects tester issues.
 
-**Live:** frontend https://student-engagement-ecosystem.vercel.app · API https://pathpilot-api-n4ox.onrender.com (`/health`). Steps 1–6 are done except the `loan-docs` bucket (Day 3); step 7 runs on Day 4.
+**Live:** frontend https://student-engagement-ecosystem.vercel.app · API https://pathpilot-api-n4ox.onrender.com (`/health`). Steps 1–6 are done (the `loan-docs` bucket exists, created by the backend); step 7 runs on Day 4.
 
 Free-tier note: the Render free instance sleeps when idle, so the first request takes about 30–60s. Hit `/health` before a demo.
 
@@ -123,5 +134,5 @@ Free-tier note: the Render free instance sleeps when idle, so the first request 
 - [x] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ✅ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
 - [x] **Day 2 – AI modules** (✅ 2.1 RAG + mentor chat with tools/citations, Gemini→Groq · ✅ 2.2 synthetic data + admit model with what-if sliders + ROI calculator · ✅ 2.3 timeline generator · ✅ 2.4 SOP reviewer · ✅ 2.5 visa mock interview)
-- [ ] **Day 3 – Loan funnel + growth**: ✅ 3.1 eligibility rules + dynamic offers + EMI/moratorium planner · loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker. Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.
+- [ ] **Day 3 – Loan funnel + growth**: ✅ 3.1 eligibility rules + dynamic offers + EMI/moratorium planner · ✅ 3.2 loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker · Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.
 - [ ] **Day 4 – Bonus loop + ship**: content agent + Discover feed, lead score, growth orchestrator + user simulator, admin Agent Console. Run the pre-share checklist on the live URL, then the solution deck (`deck/`) and demo script.

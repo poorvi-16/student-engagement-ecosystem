@@ -202,3 +202,44 @@ class VisaInterview(SQLModel, table=True):
     ai: bool = False
     created_at: datetime = Field(default_factory=utcnow, index=True)
     finished_at: datetime | None = None
+
+
+class LoanApplication(SQLModel, table=True):
+    """Education-loan application built with the copilot, then sent to the mock NBFC LOS (`mocks/nbfc_los.py`).
+
+    Section dicts (applicant, co_applicant, ...) hold form fields; Aadhaar is only ever stored as its last 4 digits.
+    """
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    product_id: str
+    course_id: int
+    amount_lakhs: float
+    status: str = Field(default="draft", index=True)  # draft | submitted (then the LOS stage applies) | withdrawn
+    applicant: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    co_applicant: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    academics: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    collateral: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    consent: dict = Field(default_factory=dict, sa_column=Column(JSON))  # {kyc, bureau, dpdp, at}
+    cibil: dict = Field(default_factory=dict, sa_column=Column(JSON))  # mock bureau result
+    los: dict = Field(default_factory=dict, sa_column=Column(JSON))  # mock LOS: reference, timeline, decision
+    created_at: datetime = Field(default_factory=utcnow)
+    updated_at: datetime = Field(default_factory=utcnow)
+    submitted_at: datetime | None = None
+
+
+class LoanDocument(SQLModel, table=True):
+    """An uploaded document: the file (private bucket, deleted after 30 days) and the fields read from it."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    application_id: int = Field(foreign_key="loanapplication.id", index=True)
+    doc_type: str
+    filename: str
+    mime: str
+    size: int
+    storage_path: str | None = None  # None = not stored (Aadhaar, storage off, or expired)
+    extracted: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    status: str = "uploaded"  # extracted | manual (AI unavailable) | failed
+    created_at: datetime = Field(default_factory=utcnow)
+    expires_at: datetime | None = None

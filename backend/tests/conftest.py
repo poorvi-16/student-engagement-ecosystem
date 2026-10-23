@@ -1,3 +1,6 @@
+import os
+
+os.environ.setdefault("OPENBLAS_NUM_THREADS", "1")  # numpy/scikit-learn: keep memory low on small machines
 import time
 import uuid
 
@@ -16,9 +19,9 @@ TEST_JWT_SECRET = "test-secret-for-hs256-tokens-only-0123456789"
 
 @pytest.fixture(autouse=True)
 def no_llm_keys(monkeypatch):
-    """Tests never call real LLM providers, even if backend/.env has keys. Tests opt in with fakes."""
+    """Tests never call real LLM providers or Supabase Storage, even if backend/.env has keys. Tests opt in with fakes."""
     s = get_settings()
-    for k in ("gemini_api_key", "groq_api_key", "anthropic_api_key"):
+    for k in ("gemini_api_key", "groq_api_key", "anthropic_api_key", "supabase_service_role_key"):  # no real storage either
         monkeypatch.setattr(s, k, "")
     monkeypatch.setattr(s, "llm_providers", "gemini,groq")
 

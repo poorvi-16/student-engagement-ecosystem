@@ -11,3 +11,7 @@ anthropic>=1.15
 # Pinned: the committed admit-model .pkl must be loaded by the same scikit-learn/numpy it was trained with
 scikit-learn==1.9.1
 numpy==2.5.4
+python-multipart>=0.0.20
+pypdfium2>=4.30
+apscheduler>=3.10,<4
+pillow>=10

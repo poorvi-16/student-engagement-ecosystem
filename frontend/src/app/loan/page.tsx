@@ -92,7 +92,7 @@ function Field({ label, children, hint }: { label: string; children: React.React
 
 const inputCls = "w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 dark:border-gray-700";
 
-function OfferCard({ o, best, chosen, onPlan }: { o: Offer; best: boolean; chosen: boolean; onPlan: () => void }) {
+function OfferCard({ o, best, chosen, onPlan, courseId }: { o: Offer; best: boolean; chosen: boolean; onPlan: () => void; courseId: number | null }) {
   return (
     <article
       className={`space-y-3 rounded-xl border p-4 ${chosen ? "border-indigo-500 ring-1 ring-indigo-500" : o.eligible ? "border-gray-200 dark:border-gray-800" : "border-dashed border-gray-300 opacity-70 dark:border-gray-700"}`}
@@ -140,7 +140,7 @@ function OfferCard({ o, best, chosen, onPlan }: { o: Offer; best: boolean; chose
               Plan EMI
             </button>
             <Link
-              href={`/loan/apply?product=${o.product_id}`}
+              href={`/loan/apply?product=${o.product_id}${courseId ? `&course=${courseId}` : ""}`}
               className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
             >
               Apply with copilot →
@@ -298,7 +298,15 @@ export default function LoanPage() {
   const [data, setData] = useState<OffersResponse | null>(null);
   const [chosen, setChosen] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [existing, setExisting] = useState<{ id: number; status: string; lender: string; stage: string | null; outcome: string | null } | null>(null);
   const amountTouched = useRef(false);
+
+  useEffect(() => {
+    if (!me?.profile) return;
+    api<{ applications: { id: number; status: string; lender: string; stage: string | null; outcome: string | null }[] }>("/loan/applications")
+      .then((r) => setExisting(r.applications[0] ?? null))
+      .catch(() => {});
+  }, [me?.profile]);
 
   useEffect(() => {
     if (!me?.profile) return;
@@ -371,6 +379,18 @@ export default function LoanPage() {
         </p>
       </header>
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">{error}</p>}
+      {existing && (
+        <Link
+          href={`/loan/apply?id=${existing.id}`}
+          className="flex items-center justify-between gap-3 rounded-xl border border-indigo-300 bg-white p-4 text-sm hover:bg-indigo-50 dark:border-indigo-800 dark:bg-gray-950 dark:hover:bg-indigo-950"
+        >
+          <span>
+            {existing.status === "submitted" ? "📍 Track your application" : "📝 Continue your application"} with {existing.lender}
+            {existing.outcome ? ` · ${existing.outcome}` : existing.stage ? ` · ${existing.stage.replace("_", " ")}` : ""}
+          </span>
+          <span className="text-indigo-600">Open →</span>
+        </Link>
+      )}
 
       <section className="grid gap-4 rounded-xl border border-gray-200 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 dark:border-gray-800">
         <Field label="Program">
@@ -466,6 +486,7 @@ export default function LoanPage() {
                   o={o}
                   best={o.product_id === data.best_id}
                   chosen={o.product_id === chosen}
+                  courseId={courseId}
                   onPlan={() => {
                     setChosen(o.product_id);
                     setTimeout(() => document.getElementById("planner")?.scrollIntoView({ behavior: "smooth" }), 50);
