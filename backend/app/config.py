@@ -44,6 +44,11 @@ class Settings(BaseSettings):
 
     daily_llm_limit: int = 50
     monthly_llm_budget: float = 20.0
+    # Kill-switch for the shared free quota: all users together may make at most this many LLM calls per 24h
+    global_daily_llm_calls: int = 1500
+
+    rate_limit_enabled: bool = True
+    sentry_dsn: str = ""
 
     @property
     def admin_email_list(self) -> list[str]:

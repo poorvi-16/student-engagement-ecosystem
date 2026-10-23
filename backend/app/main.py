@@ -3,13 +3,19 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import admin, catalog, content, growth, loan, loan_application, me, mentor, navigator, programs, sop, timeline, visa
+from app.api import admin, catalog, content, feedback, growth, loan, loan_application, me, mentor, navigator, programs, sop, timeline, visa
 from app import scheduler, storage
 from app.config import get_settings
 from app.ml import lead
+from app.ratelimit import RateLimitMiddleware
 from app.ml.admit import load_model, model_info
 
 settings = get_settings()
+
+if settings.sentry_dsn:  # optional error tracking; no personal data is attached to events
+    import sentry_sdk
+
+    sentry_sdk.init(dsn=settings.sentry_dsn, environment=settings.environment, send_default_pii=False, traces_sample_rate=0.0)
 
 
 
@@ -22,6 +28,7 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
+app.add_middleware(RateLimitMiddleware)  # added before CORS so that 429 responses still carry CORS headers
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -44,6 +51,7 @@ app.include_router(loan.router)
 app.include_router(growth.router)
 app.include_router(content.router)
 app.include_router(admin.router)
+app.include_router(feedback.router)
 
 load_model()  # load the ML models at startup rather than on the first request
 lead.load_model()

@@ -27,7 +27,7 @@ from sqlalchemy import func
 from sqlmodel import Session, select
 
 from app.config import get_settings
-from app.db.models import LlmUsage, User
+from app.db.models import AppSetting, LlmUsage, User
 
 log = logging.getLogger(__name__)
 
@@ -48,6 +48,7 @@ OPENAI_COMPAT_URLS = {
 }
 
 USER_MESSAGES = {
+    "paused": "AI features are paused by the admin. Core tools still work.",
     "rate_limited": "AI is busy right now. Showing standard results.",
     "invalid_output": "AI response was incomplete. Showing standard results.",
     "incomplete": "AI response was incomplete. Showing standard results.",
@@ -124,7 +125,14 @@ def check_limits(session: Session, user: User | None) -> None:
     if not providers():
         raise LLMUnavailable("no_api_key", "AI features are not configured yet.")
 
+    paused = session.get(AppSetting, "ai_paused")
+    if paused is not None and paused.value.get("paused"):
+        raise LLMUnavailable("paused", "AI features are paused by the admin. Core tools still work.")
+
     now = datetime.now(timezone.utc)
+    day_calls = session.exec(select(func.count()).select_from(LlmUsage).where(LlmUsage.created_at >= now - timedelta(days=1))).one()
+    if day_calls >= s.global_daily_llm_calls:
+        raise LLMUnavailable("global_daily_limit", "AI is at capacity today. Showing standard results.")
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     spent = session.exec(select(func.coalesce(func.sum(LlmUsage.cost_usd), 0.0)).where(LlmUsage.created_at >= month_start)).one()
     if spent >= s.monthly_llm_budget:

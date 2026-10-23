@@ -34,6 +34,12 @@ def no_visit_xp(monkeypatch):
 
 
 @pytest.fixture(autouse=True)
+def no_rate_limit(monkeypatch):
+    """The suite makes far more requests per minute than a person would; the limiter has its own tests."""
+    monkeypatch.setattr(get_settings(), "rate_limit_enabled", False)
+
+
+@pytest.fixture(autouse=True)
 def no_ab_testing(monkeypatch):
     """Older tests assert the control copy of nudges; A/B behaviour is tested in test_orchestrator.py."""
     monkeypatch.setattr(get_settings(), "nudge_ab", False)

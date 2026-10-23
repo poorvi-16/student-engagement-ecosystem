@@ -11,7 +11,7 @@ from sqlmodel import Session, col, select
 from app.agents import orchestrator, simulator
 from app.auth import admin_user
 from app.config import get_settings
-from app.db.models import AgentRun, ContentPost, LlmUsage, Nudge, User
+from app.db.models import AgentRun, AppSetting, ContentPost, Feedback, LlmUsage, Nudge, User, utcnow
 from app.db.session import get_session
 from app.ml import admit, lead
 from app.rules import ab
@@ -31,6 +31,15 @@ class SimulateIn(BaseModel):
     days: int = Field(default=14, ge=1, le=45)
 
 
+class AiSwitchIn(BaseModel):
+    paused: bool
+
+
+def ai_paused(session: Session) -> bool:
+    row = session.get(AppSetting, "ai_paused")
+    return bool(row and row.value.get("paused"))
+
+
 def _llm_usage(session: Session) -> dict:
     now = datetime.now(timezone.utc)
     s = get_settings()
@@ -43,6 +52,7 @@ def _llm_usage(session: Session) -> dict:
     return {"calls_24h": sum(n for _, n, _ in rows), "by_feature": [{"feature": f, "calls": n, "tokens": int(t)} for f, n, t in sorted(rows, key=lambda r: -r[1])],
             "by_model": [{"model": m, "calls": n} for m, n in sorted(models, key=lambda r: -r[1])],
             "month_cost_usd": round(float(spent), 4), "monthly_budget_usd": s.monthly_llm_budget, "daily_limit_per_user": s.daily_llm_limit,
+            "paused": ai_paused(session), "global_daily_calls": s.global_daily_llm_calls,
             "providers": s.llm_provider_list, "keys": {"gemini": bool(s.gemini_api_key), "groq": bool(s.groq_api_key)}}
 
 
@@ -149,3 +159,30 @@ def nudge_log(limit: int = Query(30, ge=1, le=100), session: Session = Depends(g
                         .order_by(col(Nudge.id).desc()).limit(limit)).all()
     return [{"id": n.id, "channel": n.channel, "status": n.status, "variant": n.variant, "source": n.source, "title": n.title,
              "key": n.key, "created_at": n.created_at} for n in rows]
+
+
+@router.post("/ai")
+def set_ai_switch(body: AiSwitchIn, session: Session = Depends(get_session)) -> dict:
+    """Kill-switch: while paused every AI feature falls back to its non-AI output, for all users, immediately."""
+    session.merge(AppSetting(key="ai_paused", value={"paused": body.paused}, updated_at=utcnow()))
+    session.commit()
+    return {"paused": body.paused}
+
+
+@router.get("/feedback")
+def feedback_list(limit: int = Query(40, ge=1, le=100), session: Session = Depends(get_session)) -> list[dict]:
+    rows = session.exec(select(Feedback, User.email).join(User, User.id == Feedback.user_id, isouter=True)
+                        .order_by(col(Feedback.id).desc()).limit(limit)).all()
+    return [{"id": f.id, "category": f.category, "rating": f.rating, "message": f.message, "page": f.page, "status": f.status,
+             "created_at": f.created_at, "from": (email or "").split("@")[0][:3] + "…" if email else None} for f, email in rows]
+
+
+@router.post("/feedback/{feedback_id}/status")
+def set_feedback_status(feedback_id: int, status: Literal["new", "done"], session: Session = Depends(get_session)) -> dict:
+    f = session.get(Feedback, feedback_id)
+    if f is None:
+        raise HTTPException(404, "Feedback not found")
+    f.status = status
+    session.add(f)
+    session.commit()
+    return {"id": f.id, "status": f.status}

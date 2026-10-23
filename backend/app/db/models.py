@@ -309,3 +309,24 @@ class AgentRun(SQLModel, table=True):
     summary: str = ""
     started_at: datetime = Field(default_factory=utcnow, index=True)
     finished_at: datetime | None = None
+
+
+class Feedback(SQLModel, table=True):
+    """Tester feedback from the in-app button; read in the admin console."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    category: str = "other"  # bug | idea | other
+    rating: int | None = None  # 1-5
+    message: str
+    page: str = ""
+    status: str = "new"  # new | done
+    created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class AppSetting(SQLModel, table=True):
+    """Runtime switches an admin can flip without a deploy (e.g. `ai_paused`, the AI kill-switch)."""
+
+    key: str = Field(primary_key=True)
+    value: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    updated_at: datetime = Field(default_factory=utcnow)

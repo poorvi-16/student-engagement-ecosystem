@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { GrowthPanel } from "@/components/GrowthPanel";
+import { MyData } from "@/components/MyData";
 import { ProfileStrength } from "@/components/ProfileStrength";
 import { supabase } from "@/lib/supabase";
 import { useMe } from "@/lib/useMe";
@@ -179,6 +180,7 @@ export default function DashboardPage() {
                 </Link>
               </section>
             )}
+            <MyData />
           </>
         )
       )}

@@ -24,12 +24,15 @@ type Overview = {
     monthly_budget_usd: number;
     daily_limit_per_user: number;
     keys: Record<string, boolean>;
+    paused: boolean;
+    global_daily_calls: number;
   };
   models: { admit: Record<string, string | number>; lead: Record<string, string | number> };
 };
 type Step = { key: string; name: string; status: string; detail: string; ms: number };
 type Run = { id: number; trigger: string; status: string; summary: string; started_at: string; finished_at: string | null; steps: Step[] };
 type Lead = { user_id: string; name: string; simulated: boolean; stage: string; score: number; hot: boolean; submitted: boolean; funding_gap_lakhs: number; target: string | null; why: { label: string; points: number }[] };
+type Feedback = { id: number; category: string; rating: number | null; message: string; page: string; status: string; created_at: string; from: string | null };
 type Msg = { id: number; channel: string; status: string; variant: string | null; source: string; title: string; created_at: string };
 
 const card = "rounded-xl border border-gray-200 p-5 dark:border-gray-800";
@@ -62,6 +65,7 @@ export default function AdminPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [threshold, setThreshold] = useState(0.25);
   const [msgs, setMsgs] = useState<Msg[]>([]);
+  const [feedback, setFeedback] = useState<Feedback[]>([]);
   const [open, setOpen] = useState<number | null>(null);
   const [busy, setBusy] = useState("");
   const [note, setNote] = useState("");
@@ -70,12 +74,14 @@ export default function AdminPage() {
   const isAdmin = me?.user.role === "admin";
 
   const load = useCallback(async () => {
-    const [o, r, l, m] = await Promise.all([
+    const [o, r, l, m, f] = await Promise.all([
       api<Overview>(`/admin/overview?scope=${scope}`),
       api<Run[]>("/admin/agent-runs?limit=8"),
       api<{ leads: Lead[]; threshold: number }>(`/admin/leads?scope=${scope}&limit=12`),
       api<Msg[]>("/admin/nudges?limit=12"),
+      api<Feedback[]>("/admin/feedback?limit=20"),
     ]);
+    setFeedback(f);
     setOv(o);
     setRuns(r);
     setLeads(l.leads);
@@ -370,6 +376,53 @@ export default function AdminPage() {
                 ))}
               </ul>
             </div>
+          </section>
+
+          <section className={`${card} space-y-3`}>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h2 className="font-semibold">Safety switches</h2>
+                <p className="text-xs text-gray-500">
+                  Rate limits are on (AI actions 20/min per user, public pages 60/min per IP). All users together may make {ov.llm.global_daily_calls} AI calls per day; per
+                  user {ov.llm.daily_limit_per_user}/day.
+                </p>
+              </div>
+              <button
+                disabled={!!busy}
+                onClick={() => act("ai", () => api("/admin/ai", { method: "POST", body: JSON.stringify({ paused: !ov.llm.paused }) }))}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium disabled:opacity-60 ${ov.llm.paused ? "bg-emerald-600 text-white" : "bg-rose-600 text-white"}`}
+              >
+                {ov.llm.paused ? "AI is paused: resume" : "Pause all AI features"}
+              </button>
+            </div>
+            {ov.llm.paused && <p className="text-sm text-rose-600">AI is paused for everyone. Every feature is using its non-AI fallback.</p>}
+          </section>
+
+          <section className={`${card} space-y-2`}>
+            <h2 className="font-semibold">Tester feedback</h2>
+            {feedback.length === 0 && <p className="text-sm text-gray-500">No feedback yet.</p>}
+            <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+              {feedback.map((f) => (
+                <li key={f.id} className="flex items-start gap-3 py-2 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <p>
+                      <span className="mr-2 rounded bg-gray-100 px-1.5 py-0.5 text-[11px] dark:bg-gray-900">{f.category}</span>
+                      {f.rating ? <span className="mr-2 text-amber-500">{"★".repeat(f.rating)}</span> : null}
+                      {f.message}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {f.from ?? "deleted user"} · {f.page || "–"} · {when(f.created_at)}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => act("fb", () => api(`/admin/feedback/${f.id}/status?status=${f.status === "done" ? "new" : "done"}`, { method: "POST" }))}
+                    className="shrink-0 text-xs text-indigo-600 hover:underline"
+                  >
+                    {f.status === "done" ? "Reopen" : "Mark done"}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section className={`${card} space-y-2`}>

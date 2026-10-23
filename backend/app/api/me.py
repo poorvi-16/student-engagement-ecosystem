@@ -11,7 +11,8 @@ from app.db.models import StudentProfile, User, utcnow
 from app.db.session import get_session
 from app.events import log_event
 from app.rules.profile_strength import compute_profile_strength
-from app.services import growth
+from app import supabase_admin
+from app.services import account, growth
 
 router = APIRouter(prefix="/me", tags=["me"])
 
@@ -123,3 +124,23 @@ def save_profile(body: ProfileIn, user: User = Depends(current_user), session: S
     session.refresh(profile)
     session.refresh(user)
     return MeResponse(user=user, profile=profile, strength=_strength(profile))
+
+
+class DeleteIn(BaseModel):
+    confirm: Literal["DELETE"]
+
+
+@router.get("/export")
+def export_my_data(user: User = Depends(current_user), session: Session = Depends(get_session)) -> dict:
+    """DPDP right of access: everything stored about the signed-in student, as JSON (uploaded files are listed, not included)."""
+    return account.export_user_data(session, user)
+
+
+@router.delete("")
+def delete_my_account(body: DeleteIn, user: User = Depends(current_user), session: Session = Depends(get_session)) -> dict:
+    """DPDP right of erasure: deletes the profile, activity, applications, uploaded documents and the sign-in account."""
+    user_id = user.id
+    out = account.delete_user_data(session, user_id)
+    session.commit()
+    out["login_removed"] = supabase_admin.delete_auth_user(str(user_id))
+    return {"deleted": True, **out}
