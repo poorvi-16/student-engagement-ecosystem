@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import catalog, content, growth, loan, loan_application, me, mentor, navigator, programs, sop, timeline, visa
 from app import scheduler, storage
 from app.config import get_settings
+from app.ml import lead
 from app.ml.admit import load_model, model_info
 
 settings = get_settings()
@@ -43,10 +44,11 @@ app.include_router(loan.router)
 app.include_router(growth.router)
 app.include_router(content.router)
 
-load_model()  # load the admit model at startup rather than on the first request
+load_model()  # load the ML models at startup rather than on the first request
+lead.load_model()
 
 
 @app.get("/health")
 def health() -> dict:
-    return {"status": "ok", "environment": settings.environment, "admit_model": model_info()["version"],
+    return {"status": "ok", "environment": settings.environment, "admit_model": model_info()["version"], "lead_model": lead.model_info()["version"],
             "storage": storage.configured()}

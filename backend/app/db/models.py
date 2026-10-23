@@ -268,7 +268,8 @@ class Nudge(SQLModel, table=True):
     cta_href: str = ""
     priority: int = 50
     status: str = "active"  # active | clicked | dismissed | expired | sent
-    source: str = "rules"  # rules | orchestrator (Day 4)
+    source: str = "rules"  # rules | orchestrator
+    variant: str | None = None  # A/B copy variant ("A" control, "B"), None = experiment off
     created_at: datetime = Field(default_factory=utcnow, index=True)
     acted_at: datetime | None = None
 
@@ -294,3 +295,17 @@ class ContentPost(SQLModel, table=True):
     views: int = 0
     run_id: int | None = Field(default=None, index=True)  # AgentRun that published it
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class AgentRun(SQLModel, table=True):
+    """One run of the growth orchestrator (agents/orchestrator.py): the audit trail shown in the admin Agent Console."""
+
+    id: int | None = Field(default=None, primary_key=True)
+    agent: str = "orchestrator"
+    trigger: str = "scheduler"  # scheduler | admin
+    status: str = "running"  # running | ok | partial | failed
+    steps: list[dict] = Field(default_factory=list, sa_column=Column(JSON))  # [{name, status, detail, ms, data}]
+    stats: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    summary: str = ""
+    started_at: datetime = Field(default_factory=utcnow, index=True)
+    finished_at: datetime | None = None

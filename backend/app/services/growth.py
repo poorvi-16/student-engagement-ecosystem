@@ -16,7 +16,7 @@ from app.db.models import (Event, LoanApplication, Nudge, Shortlist, StudentProf
                            UserBadge, VisaInterview, utcnow)
 from app.events import log_event, log_event_daily
 from app.mocks import nbfc_los, notifications
-from app.rules import gamification, nudges as nudge_rules
+from app.rules import ab, gamification, nudges as nudge_rules
 from app.rules.profile_strength import compute_profile_strength
 
 STAGES = ["explorer", "shortlister", "applicant", "admitted", "funding"]
@@ -171,11 +171,25 @@ def build_state(session: Session, user: User, p: StudentProfile, counts: dict[st
     )
 
 
+def variant_stats(session: Session) -> dict[str, tuple[int, int]]:
+    """variant -> (exposures, clicks) over every nudge that carried a variant, in-app and mock channels together."""
+    rows = session.exec(select(Nudge.variant, Nudge.status, func.count()).where(col(Nudge.variant).is_not(None))
+                        .group_by(Nudge.variant, Nudge.status)).all()
+    out: dict[str, list[int]] = {}
+    for v, status, n in rows:
+        acc = out.setdefault(v, [0, 0])
+        acc[0] += n
+        acc[1] += n if status == "clicked" else 0
+    return {v: (a, c) for v, (a, c) in out.items()}
+
+
 def refresh_nudges(session: Session, user: User, p: StudentProfile, counts: dict[str, int], today: date | None = None) -> list[Nudge]:
     """Syncs in-app nudges with the current state and returns the top active ones."""
     today = today or datetime.now(timezone.utc).date()
-    cands = {n.key: n for n in nudge_rules.candidates(build_state(session, user, p, counts, today))}
+    state = build_state(session, user, p, counts, today)
+    cands = {n.key: n for n in nudge_rules.candidates(state)}
     rows = session.exec(select(Nudge).where(Nudge.user_id == user.id, Nudge.channel == "in_app")).all()
+    ab_stats = variant_stats(session) if get_settings().nudge_ab else None
     cutoff = datetime.now(timezone.utc) - timedelta(days=NUDGE_COOLDOWN_DAYS)
     by_key: dict[str, Nudge] = {}
     for r in rows:
@@ -183,28 +197,40 @@ def refresh_nudges(session: Session, user: User, p: StudentProfile, counts: dict
         if r.id and (by_key[r.key].id or 0) < r.id:
             by_key[r.key] = r
     for r in rows:
-        if r.status == "active" and r.key not in cands:
+        if r.status != "active":
+            continue
+        if r.source == "orchestrator":  # agent-written nudges expire after a week or once a loan application exists
+            if _aware(r.created_at) < cutoff or state.loan_draft_id or state.loan_submitted_id:
+                r.status = "expired"
+                session.add(r)
+        elif r.key not in cands:
             r.status = "expired"  # condition no longer true (e.g. task done)
             session.add(r)
     for key, n in cands.items():
         prev = by_key.get(key)
         if prev and (prev.status == "active" or _aware(prev.acted_at or prev.created_at) > cutoff):
             if prev.status == "active":  # keep text fresh (counts change)
-                prev.title, prev.body, prev.priority = n.title, n.body, n.priority
+                prev.title, prev.body = nudge_rules.variant_copy(n, prev.variant)
+                prev.priority = n.priority
                 session.add(prev)
             continue
-        session.add(Nudge(user_id=user.id, key=key, title=n.title, body=n.body, cta_label=n.cta_label, cta_href=n.cta_href,
-                          priority=n.priority))
+        variant = ab.choose(ab_stats, f"{user.id}:{key}") if ab_stats is not None else None
+        title, body = nudge_rules.variant_copy(n, variant)
+        session.add(Nudge(user_id=user.id, key=key, title=title, body=body, cta_label=n.cta_label, cta_href=n.cta_href,
+                          priority=n.priority, variant=variant))
     session.flush()
     active = session.exec(select(Nudge).where(Nudge.user_id == user.id, Nudge.channel == "in_app", Nudge.status == "active")
                           .order_by(col(Nudge.priority).desc(), col(Nudge.id).desc())).all()
     return list(active[:MAX_ACTIVE_NUDGES])
 
 
-def push_nudges(session: Session, today: date | None = None) -> int:
-    """Scheduled: sends each opted-in student's top high-priority nudge on a mock channel (max one per 3 days)."""
+def push_nudges(session: Session, today: date | None = None, source: str = "rules") -> int:
+    """Scheduled: sends each opted-in student's top high-priority nudge on a mock channel (max one per 3 days).
+
+    With A/B testing on, the copy variant comes from `rules/ab.py` and is stored on the nudge for the CTR readout."""
     today = today or datetime.now(timezone.utc).date()
     sent = 0
+    ab_stats = variant_stats(session) if get_settings().nudge_ab else None
     site = get_settings().cors_origins[0] if get_settings().cors_origins else ""
     for p in session.exec(select(StudentProfile).where(StudentProfile.consent_marketing == True)).all():  # noqa: E712
         user = session.get(User, p.user_id)
@@ -218,10 +244,13 @@ def push_nudges(session: Session, today: date | None = None) -> int:
         if not top:
             continue
         channel = "whatsapp" if p.journey_stage in ("admitted", "funding") else "email"
+        variant = ab.choose(ab_stats, f"{user.id}:{top.key}:{channel}") if ab_stats is not None else None
+        top.title, top.body = nudge_rules.variant_copy(top, variant)
         notifications.send(channel, user.email, nudge_rules.push_message(top, user.full_name, site))
         session.add(Nudge(user_id=user.id, key=top.key, channel=channel, title=top.title, body=top.body,
-                          cta_label=top.cta_label, cta_href=top.cta_href, priority=top.priority, status="sent"))
-        log_event(session, user, "nudge_sent", {"key": top.key, "channel": channel})
+                          cta_label=top.cta_label, cta_href=top.cta_href, priority=top.priority, status="sent",
+                          source=source, variant=variant))
+        log_event(session, user, "nudge_sent", {"key": top.key, "channel": channel, "variant": variant})
         sent += 1
     session.commit()
     return sent

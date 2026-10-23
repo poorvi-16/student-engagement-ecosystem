@@ -5,6 +5,7 @@ The loan triggers (funding gap → offers → copilot → finish application) ar
 """
 
 import hashlib
+import re
 from dataclasses import dataclass, field
 from datetime import date
 
@@ -100,6 +101,39 @@ def candidates(s: State) -> list[Nudge]:
         add("mentor", "Ask the AI Mentor anything", "Visas, tests, scholarships and loans, with answers cited from our guides.",
             "Ask a question", "/mentor", 40)
     return sorted(out, key=lambda n: -n.priority)
+
+
+# Variant B: benefit-led headlines. Same facts and the same destination as A; only the framing changes (no fake urgency).
+def _gap(n: Nudge) -> str:
+    m = re.search(r"₹([\d.]+)L", n.title)
+    return m.group(1) if m else ""
+
+
+B_TITLES = {
+    "loan_decision": None,
+    "loan_finish": lambda n: "You're close: finish your loan application",
+    "loan_gap": lambda n: f"Cover your ₹{_gap(n)}L gap: compare 4 lenders in minutes",
+    "loan_copilot": lambda n: "Skip the paperwork: let the copilot fill your loan form",
+    "tasks_overdue": lambda n: n.title.replace(" overdue", " slipped, get back on track"),
+    "due_soon": lambda n: "Don't miss this deadline",
+    "make_timeline": lambda n: "Your application plan is one click away",
+    "navigator": lambda n: "Find your best-fit universities in 2 minutes",
+    "shortlist": lambda n: "Turn favourites into a shortlist",
+    "sop_review": lambda n: "Is your SOP strong enough? Find out in a minute",
+    "visa_practice": lambda n: "Rehearse your visa interview before the real one",
+    "tip": lambda n: "A quick win for your profile",
+    "mentor": lambda n: "Stuck on something? Ask the mentor",
+    "after_sanction_visa": lambda n: "Be ready to explain how you'll pay",
+}
+
+
+def variant_copy(n: Nudge, variant: str | None) -> tuple[str, str]:
+    """(title, body) for the A/B variant; A, None and nudges without a B headline keep the original copy."""
+    if variant == "B":
+        fn = B_TITLES.get(n.key.split(":")[0])
+        if fn:
+            return fn(n), n.body
+    return n.title, n.body
 
 
 def push_message(n: Nudge, name: str | None, site: str) -> str:

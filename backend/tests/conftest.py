@@ -33,6 +33,12 @@ def no_visit_xp(monkeypatch):
     monkeypatch.setattr(growth, "DAILY_VISIT_XP", 0)
 
 
+@pytest.fixture(autouse=True)
+def no_ab_testing(monkeypatch):
+    """Older tests assert the control copy of nudges; A/B behaviour is tested in test_orchestrator.py."""
+    monkeypatch.setattr(get_settings(), "nudge_ab", False)
+
+
 @pytest.fixture
 def engine():
     eng = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)

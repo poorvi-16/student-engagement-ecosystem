@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     # Comma-separated emails that get the admin role on first login
     admin_emails: str = ""
 
+    nudge_ab: bool = True  # A/B test nudge copy (rules/ab.py)
+
     daily_llm_limit: int = 50
     monthly_llm_budget: float = 20.0
 

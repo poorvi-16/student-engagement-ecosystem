@@ -1,0 +1,66 @@
+{
+  "features": [
+    "profile_strength",
+    "stage",
+    "days_since_signup",
+    "active_days",
+    "navigator_runs",
+    "shortlisted",
+    "roi_calcs",
+    "loan_estimates",
+    "loan_plans",
+    "tasks_done",
+    "mentor_messages",
+    "content_views",
+    "sop_reviews",
+    "visa_mocks",
+    "co_applicant_income_lpa",
+    "funding_gap_lakhs",
+    "has_collateral",
+    "nudge_clicks",
+    "loan_started"
+  ],
+  "version": "lead-v1",
+  "baseline": [
+    57.47129631832796,
+    0.0,
+    30.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "algorithm": "HistGradientBoostingClassifier (monotonic constraints)",
+  "rows": 40000,
+  "base_rate": 0.0573,
+  "metrics": {
+    "model": {
+      "auc": 0.801,
+      "brier": 0.0396
+    },
+    "logistic_regression": {
+      "auc": 0.7945,
+      "brier": 0.0405
+    },
+    "heuristic": {
+      "auc": 0.7841,
+      "brier": 0.0412
+    }
+  },
+  "top_decile_lift": 5.55,
+  "data": "synthetic cohorts with a hidden conversion process (no real conversions yet)",
+  "sklearn": "1.9.1",
+  "trained_at": "2026-10-23T18:42:35+00:00"
+}

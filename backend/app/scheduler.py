@@ -32,12 +32,21 @@ def send_nudges() -> None:
         log.info("Sent %d mock nudges", n)
 
 
+def run_orchestrator() -> None:
+    from app.agents import orchestrator  # imported lazily: it pulls in the content, ML and growth modules
+
+    with Session(engine) as session:
+        run = orchestrator.run(session, trigger="scheduler")
+    log.info("Growth orchestrator run %s: %s (%s)", run.id, run.status, run.summary)
+
+
 def start() -> None:
     if scheduler.running:
         return
     scheduler.add_job(cleanup_documents, "interval", hours=6, id="cleanup_documents", replace_existing=True,
                       next_run_time=datetime.now(timezone.utc) + timedelta(minutes=1))
-    scheduler.add_job(send_nudges, "cron", hour=4, minute=30, id="send_nudges", replace_existing=True)  # 10:00 IST
+    # The orchestrator's nurture step sends the daily nudges (A/B copy), so it replaces the plain nudge job below.
+    scheduler.add_job(run_orchestrator, "cron", hour=4, minute=30, id="growth_orchestrator", replace_existing=True)  # 10:00 IST
     scheduler.start()
 
 
