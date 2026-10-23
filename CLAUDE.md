@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 In progress — see the build schedule checkboxes. Sections describe the target design; update them as pieces become real. Full plan: `docs/PLAN.md`.
-**Work phase-wise: finish one step, report, and get the user's explicit go-ahead before starting the next.**
+**Work day-wise: complete all steps of a build day without pausing (commit + push after each step), stop mid-day only if the user must do something, then give a full briefing and get the go-ahead before the next day.**
 
 ## Git workflow (required after every completed step)
 Remote: `origin` → https://github.com/poorvi-16/student-engagement-ecosystem (branch `main`). Render and Vercel deploy from it.
@@ -69,6 +69,8 @@ Backend layout under `backend/app/`: `api/` (one router per module), `agents/`, 
 
 **Program page = admit + ROI.** `/programs/{id}` (frontend `app/programs/[id]`) combines what-if sliders (`POST /programs/{id}/admit` with score overrides) and the ROI calculator (`POST /programs/{id}/roi` with assumptions). `rules/roi.py` is pure: tuition + living (lifestyle) + rupee-depreciation buffer + one-time costs (`catalog_meta.json` `one_time_lakhs`) − scholarship; own funds are spent first and the rest is a loan with simple interest during course + 6 months, then EMIs (`rules/finance.py`, reused by the Day 3 planner); payback = years of savings (35% of a 7%-growing salary) to recover cost + all interest; "work in India" uses the India field median × 1.25. It also compares against the best-value India program (or the best abroad one for an India program). The `roi_calc` event stores the funding gap for the loan funnel. Slider endpoints log events via `events.log_event_daily` (one row per program per day).
 
+**Timeline.** `rules/timeline.py:build_plan` builds every dated task from intake (season start month per country), program deadlines (shortlist, else navigator picks; Spring intakes close ~4 months before start), missing tests (GRE only for US programs), SOP/LOR/docs, per-country visa steps (`VISA_STEPS`), loan apply → sanction letter before the visa, and travel. Fixed tasks (deadlines, CAT/GATE dates) keep their date; overdue prep tasks are re-spaced in order before the first deadline. `services/timeline.py` makes one `llm.parse` call (cached in AiCache) for a summary, per-task tips and ≤3 extra tasks. It never changes dates. Tasks live in `timelinetask` with stable `key`s (regenerating keeps ticks); `timelineplan.input_hash` flags a stale plan. +40 XP for the first plan, +10 XP once per task (`xp_awarded`); ticking an `apply:*` task moves the journey stage to applicant. The mentor's system prompt includes the next 3 open tasks.
+
 **Deterministic vs LLM.** Loan eligibility, offers, EMI, and FOIR are **pure rule code** in `rules/` and are unit-tested; never let the LLM compute money or decide eligibility. ML gives scores. The LLM explains, converses, generates content, and extracts documents.
 
 **Growth engine.** Every user action is written to an `events` table. Journey stage (Explorer → Shortlister → Applicant → Admitted → Funding), interest tags, and lead score are derived from events. This drives feed ordering, nudges, and when the loan copilot is triggered. The Growth Orchestrator (scheduled) chains content agent → nudge agent → loan copilot trigger → metrics/A-B feedback. Every agent action is logged to an `agent_runs` table that the admin Agent Console displays. A user simulator generates a synthetic cohort so the loop has data to act on.
@@ -108,6 +110,6 @@ Free-tier note: the Render free instance sleeps when idle, so the first request 
 ## Build schedule (4 days)
 - [x] **Day 1 – Foundation** (✅ 1.1 scaffold · ✅ 1.2 Supabase DB + auth · ✅ 1.3 quiz + profile strength + catalog · ✅ 1.4 deploy · ✅ 1.5 Claude wrapper + navigator)
   - Original scope: **Day 1 – Foundation + deploy + engagement core**: scaffold both apps, Supabase setup, DB models + Alembic, auth, seed data, onboarding quiz + profile strength. **Deploy to Render + Vercel by end of day.** Claude client wrapper (limits/budget) and career navigator.
-- [ ] **Day 2 – AI modules**: ✅ 2.1 RAG + mentor chat (tools, citations, Gemini→Groq) · ✅ 2.2 synthetic data + admit model with what-if sliders + ROI calculator · timeline generator, SOP reviewer + visa mock interview (single prompt flows).
+- [ ] **Day 2 – AI modules**: ✅ 2.1 RAG + mentor chat (tools, citations, Gemini→Groq) · ✅ 2.2 synthetic data + admit model with what-if sliders + ROI calculator · ✅ 2.3 timeline generator · SOP reviewer + visa mock interview (single prompt flows).
 - [ ] **Day 3 – Loan funnel + growth**: eligibility rules, dynamic offers, EMI/moratorium planner, loan copilot with doc upload + vision auto-fill, mock CIBIL/LOS + status tracker. Events table, journey stage, XP/streaks/badges, referral code + share card, nudges.
 - [ ] **Day 4 – Bonus loop + ship**: content agent + Discover feed, lead score, growth orchestrator + user simulator, admin Agent Console. Run the pre-share checklist on the live URL, then the solution deck (`deck/`) and demo script.

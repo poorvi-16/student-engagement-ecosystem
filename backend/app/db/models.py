@@ -2,7 +2,7 @@
 
 import secrets
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 
 from sqlalchemy import JSON, Column, UniqueConstraint
 from sqlmodel import Field, SQLModel
@@ -136,3 +136,37 @@ class ChatMessage(SQLModel, table=True):
     tools: list[str] = Field(default_factory=list, sa_column=Column(JSON))  # tool names used for this answer
     ai: bool = True  # False = fallback answer built from search results without the LLM
     created_at: datetime = Field(default_factory=utcnow, index=True)
+
+
+class TimelinePlan(SQLModel, table=True):
+    """One application plan per student; `input_hash` detects when profile/shortlist changes make it stale."""
+
+    user_id: uuid.UUID = Field(primary_key=True, foreign_key="user.id")
+    intake: str | None = None
+    start_date: date | None = None
+    main_country: str | None = None
+    summary: str = ""
+    warning: str | None = None
+    ai: bool = False
+    input_hash: str = ""
+    generated_at: datetime = Field(default_factory=utcnow)
+
+
+class TimelineTask(SQLModel, table=True):
+    """A dated checklist item. `key` is stable across regenerations so ticked tasks stay ticked."""
+
+    __table_args__ = (UniqueConstraint("user_id", "key"),)
+
+    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", index=True)
+    key: str
+    title: str
+    detail: str = ""
+    category: str
+    due_date: date
+    fixed: bool = False  # a real deadline or exam date
+    course_id: int | None = None
+    source: str = "rule"  # rule | ai
+    done: bool = False
+    done_at: datetime | None = None
+    xp_awarded: bool = False

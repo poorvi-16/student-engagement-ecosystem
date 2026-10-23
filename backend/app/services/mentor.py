@@ -18,7 +18,7 @@ from app.catalog import get_catalog
 from app.db.models import ChatMessage, StudentProfile, User
 from app.rag.kb import Chunk, get_kb
 from app.rules.roi import RoiAssumptions
-from app.services import programs
+from app.services import programs, timeline
 from app.services.navigator import MONTHS, _profile_brief, build_matches, make_matches
 
 HISTORY_TURNS = 10  # past messages sent to the model as memory
@@ -44,7 +44,8 @@ Rules:
 - End with one concrete next step when useful.
 - Only help with higher education, careers and study finance. Politely decline anything else.
 
-Student profile (JSON): {profile}"""
+Student profile (JSON): {profile}
+The student's next open tasks from their PathPilot application timeline (JSON; empty if they haven't made one, in which case suggest the Timeline page for planning questions): {next_tasks}"""
 
 WHAT_IF_FIELDS = ("cgpa", "gre", "gmat", "ielts", "toefl", "entrance_percentile", "work_exp_months")
 WHAT_IF_RANGES = {"cgpa": (4, 10), "gre": (260, 340), "gmat": (200, 800), "ielts": (4, 9), "toefl": (0, 120),
@@ -276,6 +277,8 @@ def answer(session: Session, user: User, question: str) -> tuple[ChatMessage, st
     system = SYSTEM.format(
         today=date.today().isoformat(),
         profile=json.dumps(_profile_brief(p) if p else {"note": "quiz not completed"}, ensure_ascii=False, default=str),
+        next_tasks=json.dumps([{"task": t.title, "due": t.due_date.isoformat()} for t in timeline.upcoming(session, user, 3)],
+                              ensure_ascii=False),
     )
     # Old citation ids belong to old turns' search results; drop them so the model doesn't reuse them
     messages = [{"role": m.role, "content": CITATION_RE.sub("", m.content)} for m in past]

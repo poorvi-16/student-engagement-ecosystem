@@ -106,10 +106,21 @@ export default function DashboardPage() {
                   </p>
                   <p className="mt-2 text-xs font-medium text-amber-600">+20 XP what-if · +20 XP ROI</p>
                 </Link>
-                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 dark:border-gray-700">
+                <Link
+                  href="/timeline"
+                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                >
+                  <p className="text-2xl">🗓️</p>
+                  <h2 className="mt-2 font-semibold">Application timeline</h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Your month-by-month plan: tests, SOP, LORs, deadlines, loan and visa — tick tasks off as you go.
+                  </p>
+                  <p className="mt-2 text-xs font-medium text-amber-600">+40 XP for your plan · +10 XP per task</p>
+                </Link>
+                <div className="rounded-xl border border-dashed border-gray-300 p-5 text-gray-500 sm:col-span-2 dark:border-gray-700">
                   <p className="text-2xl">🔒</p>
                   <h2 className="mt-2 font-semibold">More tools coming</h2>
-                  <p className="text-sm">Application timeline, SOP reviewer, visa mock interview and loan planner unlock next.</p>
+                  <p className="text-sm">SOP reviewer, visa mock interview and the loan planner unlock next.</p>
                 </div>
               </section>
             ) : (
