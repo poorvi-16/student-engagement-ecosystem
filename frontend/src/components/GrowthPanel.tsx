@@ -114,7 +114,7 @@ export function GrowthPanel({ onXp }: { onXp?: () => void }) {
         </section>
       )}
 
-      <section className="space-y-3 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+      <section className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="font-semibold">
             Level {g.level.number} · {g.level.name}
@@ -145,7 +145,7 @@ export function GrowthPanel({ onXp }: { onXp?: () => void }) {
         </ul>
       </section>
 
-      <section className="space-y-3 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+      <section className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">🤝 Invite friends</h2>
           <span className="text-sm text-gray-600 dark:text-gray-400">

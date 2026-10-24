@@ -129,3 +129,49 @@ def test_attribution_recorded_once(client, engine):
     with Session(engine) as s:
         rows = s.exec(select(Event).where(Event.type == "signup_attribution")).all()
         assert len(rows) == 1 and rows[0].payload["source"] == "guide"
+
+
+def test_aspects_cover_the_whole_journey():
+    assert feed.aspect(["country:USA", "topic:visa"])[0] == "visa"
+    assert feed.aspect(["topic:funding", "topic:forex"])[0] == "money"
+    assert feed.aspect(["topic:careers"])[0] == "careers"
+    assert feed.aspect(["topic:life", "topic:predeparture"])[0] == "life"
+    assert feed.aspect(["country:Germany"]) == ("countries", "Countries")
+    slugs = {t.slug for t in content.topics()}
+    assert {"work-rights-and-careers-abroad", "accommodation-and-living-costs", "banking-forex-and-sending-money",
+            "choosing-the-right-course-and-university", "application-mistakes-to-avoid", "pre-departure-checklist",
+            "settling-in-and-student-life"} <= slugs
+    seen = {feed.aspect(t.tags)[0] for t in content.topics()}
+    assert seen == {"visa", "careers", "apply", "money", "life", "plan", "countries"}
+
+
+def test_feed_varies_topics_and_aspects():
+    items = [feed.Item(i, "guide", ("country:USA", "topic:visa"), 0, NOW, "usa-f1-visa") for i in range(1, 5)]
+    items += [feed.Item(10, "guide", ("topic:life",), 0, NOW, "accommodation-and-living-costs"),
+              feed.Item(11, "guide", ("topic:careers",), 0, NOW, "work-rights-and-careers-abroad"),
+              feed.Item(12, "guide", ("topic:funding",), 0, NOW, "scholarships")]
+    top = feed.rank(items, ["country:USA"], "admitted", limit=4, now=NOW)
+    assert len({i.topic for i, _ in top}) >= 3  # not four posts from one topic even when the student likes it
+
+
+def test_sources_are_all_links_with_readable_names(engine):
+    t = next(t for t in content.topics() if t.slug == "usa-f1-visa")
+    assert len(t.sources) >= 2 and all(s["url"].startswith("https://") and "." in s["title"] for s in t.sources)
+    assert content.source_label("https://www.gov.uk/student-visa") == "gov.uk"
+    with Session(engine) as s:
+        content.publish_topic(s, t)
+        s.commit()
+        slugs = [p.slug for p in s.exec(select(ContentPost)).all()]
+    assert all(slug for slug in slugs)
+
+
+def test_cards_carry_aspect_and_source_links(client, engine):
+    with Session(engine) as s:
+        content.run(s, n=3)
+    h = auth(make_token())
+    client.put("/me/profile", json=QUIZ, headers=h)
+    feed_ = client.get("/content/feed", headers=h).json()
+    assert {a["id"] for a in feed_["aspects"]} >= {"visa", "money", "life", "careers"}
+    card = feed_["posts"][0]
+    assert card["aspect"]["label"] and card["sources"] and card["sources"][0]["url"].startswith("https://")
+    assert client.get("/content").json()[0]["sources"]

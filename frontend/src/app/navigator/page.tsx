@@ -56,7 +56,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function MatchCard({ m, starred, onStar }: { m: Match; starred: boolean; onStar: () => void }) {
   return (
-    <article className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+    <article className="flex flex-col gap-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
       <div className="flex items-start justify-between gap-2">
         <div>
           <h3 className="font-semibold leading-snug">{m.university}</h3>

@@ -10,7 +10,7 @@ type Mode = "signin" | "signup" | "magic";
 
 const inputCls = "w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 dark:border-gray-700";
 const primaryBtn =
-  "w-full rounded-lg bg-indigo-600 px-3 py-2 font-medium text-white hover:bg-indigo-700 disabled:opacity-60";
+  "w-full rounded-lg bg-indigo-600 px-3 py-2 font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-60";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -67,9 +67,10 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
+      <div className="w-full max-w-sm space-y-6 rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-xl shadow-indigo-500/10 sm:p-8">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">PathPilot</h1>
+          <span className="gradient-brand mx-auto flex h-12 w-12 items-center justify-center rounded-2xl text-xl text-white">✈</span>
+          <h1 className="mt-3 text-2xl font-bold">Welcome to PathPilot</h1>
           <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">Sign in to start your journey</p>
         </div>
 

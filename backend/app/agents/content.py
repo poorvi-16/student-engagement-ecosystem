@@ -42,6 +42,13 @@ TOPIC_TAGS: dict[str, list[str]] = {
     "scholarships": ["topic:funding"],
     "sop-lor": ["topic:sop"],
     "tests-gre-gmat-english": ["topic:tests"],
+    "work-rights-and-careers-abroad": ["topic:careers"],
+    "accommodation-and-living-costs": ["topic:life"],
+    "banking-forex-and-sending-money": ["topic:funding", "topic:forex"],
+    "choosing-the-right-course-and-university": ["topic:planning"],
+    "application-mistakes-to-avoid": ["topic:applications"],
+    "pre-departure-checklist": ["topic:predeparture", "topic:life"],
+    "settling-in-and-student-life": ["topic:life"],
 }
 AUDIENCES = [
     "Indian undergraduates in their final year planning a master's abroad",
@@ -82,6 +89,12 @@ class Topic:
     sources: list[dict]
 
 
+def source_label(url: str) -> str:
+    """Readable name for a source link: its domain without www."""
+    m = re.match(r"https?://(?:www\.)?([^/]+)", url)
+    return m.group(1) if m else url
+
+
 def topics() -> list[Topic]:
     by_slug: dict[str, list[Chunk]] = defaultdict(list)
     for c in get_kb().chunks:
@@ -91,7 +104,8 @@ def topics() -> list[Topic]:
         chunks = by_slug.get(slug)
         if chunks:
             c0 = chunks[0]
-            out.append(Topic(slug, c0.title, tags, chunks, c0.reviewed, [{"title": c0.title, "url": c0.url, "reviewed": c0.reviewed}]))
+            out.append(Topic(slug, c0.title, tags, chunks, c0.reviewed,
+                             [{"title": source_label(u), "url": u, "reviewed": c0.reviewed} for u in (c0.urls or (c0.url,)) if u]))
     return out
 
 

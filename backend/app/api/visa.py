@@ -55,8 +55,16 @@ def overview(user: User = Depends(current_user), session: Session = Depends(get_
     cat = get_catalog()
     by_id = {c.id: c for c in cat.courses}
     ids = session.exec(select(Shortlist.course_id).where(Shortlist.user_id == user.id)).all()
-    shortlist = [{"course_id": i, "country": cat.universities[by_id[i].university_id].country,
+    shortlist = [{"course_id": i, "country": cat.universities[by_id[i].university_id].country, "source": "shortlist",
                   "label": f"{by_id[i].program}, {cat.universities[by_id[i].university_id].name}"} for i in ids if i in by_id]
+    # Suggest programs for countries with no shortlisted program: the best-known ones in the student's field and level
+    seen = set(ids)
+    for country in rules.COUNTRIES:
+        pool = [c for c in cat.courses if c.id not in seen and cat.universities[c.university_id].country == country
+                and (not p or (c.field == p.target_field and c.level == p.target_level))]
+        pool.sort(key=lambda c: (cat.universities[c.university_id].tier, cat.universities[c.university_id].qs_rank or 9999))
+        shortlist += [{"course_id": c.id, "country": country, "source": "suggested",
+                       "label": f"{c.program}, {cat.universities[c.university_id].name}"} for c in pool[:4]]
     rows = session.exec(select(VisaInterview).where(VisaInterview.user_id == user.id)
                         .order_by(col(VisaInterview.id).desc()).limit(HISTORY)).all()
     active = next((r for r in rows if r.status == "active"), None)

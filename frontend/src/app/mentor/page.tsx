@@ -268,7 +268,7 @@ export default function MentorPage() {
         <button
           type="submit"
           disabled={sending || !input.trim()}
-          className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+          className="rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
         >
           Send
         </button>

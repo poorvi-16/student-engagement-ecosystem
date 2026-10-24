@@ -10,11 +10,12 @@ export type PostCard = {
   created_at: string;
   why: string | null;
   body: string | null;
+  aspect: { id: string; label: string };
+  sources: { title: string; url: string; reviewed: string }[];
 };
 
 export type Post = PostCard & {
   body: string;
-  sources: { title: string; url: string; reviewed: string }[];
   ai: boolean;
   related: PostCard[];
 };

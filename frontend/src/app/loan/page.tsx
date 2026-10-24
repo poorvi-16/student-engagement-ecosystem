@@ -95,7 +95,7 @@ const inputCls = "w-full rounded-lg border border-gray-300 bg-transparent px-3 p
 function OfferCard({ o, best, chosen, onPlan, courseId }: { o: Offer; best: boolean; chosen: boolean; onPlan: () => void; courseId: number | null }) {
   return (
     <article
-      className={`space-y-3 rounded-xl border p-4 ${chosen ? "border-indigo-500 ring-1 ring-indigo-500" : o.eligible ? "border-gray-200 dark:border-gray-800" : "border-dashed border-gray-300 opacity-70 dark:border-gray-700"}`}
+      className={`space-y-3 rounded-xl border p-4 ${chosen ? "border-indigo-500 ring-1 ring-indigo-500" : o.eligible ? "border-gray-200" : "border-dashed border-gray-300 opacity-70 dark:border-gray-700"}`}
     >
       <div className="flex items-start justify-between gap-2">
         <div>
@@ -141,7 +141,7 @@ function OfferCard({ o, best, chosen, onPlan, courseId }: { o: Offer; best: bool
             </button>
             <Link
               href={`/loan/apply?product=${o.product_id}${courseId ? `&course=${courseId}` : ""}`}
-              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700"
+              className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
             >
               Apply with copilot →
             </Link>
@@ -179,7 +179,7 @@ function Planner({ courseId, offer }: { courseId: number; offer: Offer }) {
   useDebounced(load, [JSON.stringify(inputs)]);
 
   return (
-    <section id="planner" className="space-y-4 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+    <section id="planner" className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
       <h2 className="font-semibold">📅 EMI &amp; moratorium planner · {offer.name}</h2>
       <div className="grid gap-6 md:grid-cols-2">
         <div className="space-y-3 text-sm">
@@ -392,7 +392,7 @@ export default function LoanPage() {
         </Link>
       )}
 
-      <section className="grid gap-4 rounded-xl border border-gray-200 p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3 dark:border-gray-800">
+      <section className="grid gap-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:grid-cols-2 sm:p-5 lg:grid-cols-3">
         <Field label="Program">
           <select value={courseId ?? ""} onChange={(e) => setCourseId(Number(e.target.value))} className={inputCls}>
             {ctx?.programs.map((p) => (

@@ -35,7 +35,7 @@ type Interview = {
 type Overview = {
   countries: { id: string; label: string }[];
   default_country: string;
-  programs: { course_id: number; country: string; label: string }[];
+  programs: { course_id: number; country: string; label: string; source: "shortlist" | "suggested" }[];
   active: Interview | null;
   history: { id: number; country: string; program_label: string; score: number | null; created_at: string }[];
 };
@@ -209,7 +209,7 @@ export default function VisaPage() {
       {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">{error}</p>}
 
       {(!iv || iv.status !== "active") && ov && (
-        <section className="space-y-3 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+        <section className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="space-y-1 text-sm">
               <span className="font-medium">Country</span>
@@ -236,20 +236,27 @@ export default function VisaPage() {
                 onChange={(e) => setCourseId(e.target.value)}
                 className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 dark:border-gray-700"
               >
-                {programsForCountry.map((p) => (
-                  <option key={p.course_id} value={p.course_id}>
-                    {p.label}
-                  </option>
-                ))}
-                <option value="">Not chosen yet</option>
+                {(["shortlist", "suggested"] as const).map((src) => {
+                  const list = programsForCountry.filter((p) => p.source === src);
+                  return list.length ? (
+                    <optgroup key={src} label={src === "shortlist" ? "Your shortlist" : "Suggested for your field"}>
+                      {list.map((p) => (
+                        <option key={p.course_id} value={p.course_id}>
+                          {p.label}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : null;
+                })}
+                <option value="">No specific program (general questions)</option>
               </select>
             </label>
           </div>
           <p className="text-xs text-gray-500">
             The officer sees your program and funding plan (cost and loan needed), so answer as you would for real.
-            {programsForCountry.length === 0 && " Save a program in this country in the Navigator for a more realistic interview."}
+            {!courseId && " With no program selected the officer asks general questions; pick one for a more realistic interview."}
           </p>
-          <button onClick={start} disabled={busy} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50">
+          <button onClick={start} disabled={busy} className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50">
             {busy ? "Starting…" : iv?.status === "done" ? "Practise again" : "Start interview · +50 XP"}
           </button>
         </section>
@@ -269,7 +276,7 @@ export default function VisaPage() {
 
           {iv.turns.map((t, i) => (
             <div key={i} className="space-y-2">
-              <p className="max-w-[88%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-4 py-2.5 text-sm dark:border-gray-800 dark:bg-gray-950">
+              <p className="max-w-[88%] rounded-2xl rounded-bl-sm border border-gray-200 bg-white px-4 py-2.5 text-sm dark:bg-gray-950">
                 <span className="mr-1">👮</span>
                 {t.question}
               </p>
@@ -308,7 +315,7 @@ export default function VisaPage() {
                 <button
                   onClick={submit}
                   disabled={busy || !answer.trim()}
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
                 >
                   {busy ? "Officer is thinking…" : "Answer"}
                 </button>
@@ -317,7 +324,7 @@ export default function VisaPage() {
           )}
 
           {iv.status === "done" && iv.summary && (
-            <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-950">
+            <div className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] bg-white p-4 dark:bg-gray-950">
               <div className="flex items-center gap-4">
                 <div className="text-center">
                   <p className="text-4xl font-bold tabular-nums">{iv.summary.score}</p>
@@ -352,7 +359,7 @@ export default function VisaPage() {
       {ov && ov.history.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Past interviews</h2>
-          <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 text-sm dark:divide-gray-800 dark:border-gray-800">
+          <ul className="divide-y divide-gray-100 rounded-2xl border border-[var(--line)] bg-[var(--surface)] text-sm dark:divide-gray-800">
             {ov.history.map((h) => (
               <li key={h.id}>
                 <button

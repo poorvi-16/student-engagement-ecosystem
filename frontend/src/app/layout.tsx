@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/AuthProvider";
+import { AppNav } from "@/components/AppNav";
 import { FeedbackButton } from "@/components/FeedbackButton";
 import { RefCapture } from "@/components/RefCapture";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -33,6 +34,7 @@ export default function RootLayout({
       >
         <RefCapture />
         <AuthProvider>
+          <AppNav />
           {children}
           <SiteFooter />
           <FeedbackButton />

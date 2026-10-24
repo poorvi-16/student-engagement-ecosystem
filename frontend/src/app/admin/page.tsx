@@ -35,7 +35,7 @@ type Lead = { user_id: string; name: string; simulated: boolean; stage: string; 
 type Feedback = { id: number; category: string; rating: number | null; message: string; page: string; status: string; created_at: string; from: string | null };
 type Msg = { id: number; channel: string; status: string; variant: string | null; source: string; title: string; created_at: string };
 
-const card = "rounded-xl border border-gray-200 p-5 dark:border-gray-800";
+const card = "rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5";
 const STATUS: Record<string, string> = {
   ok: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300",
   skipped: "bg-gray-100 text-gray-600 dark:bg-gray-900 dark:text-gray-400",
@@ -159,7 +159,7 @@ export default function AdminPage() {
                 <button
                   disabled={!!busy}
                   onClick={() => act("run", () => api("/admin/orchestrator/run", { method: "POST", body: JSON.stringify({ content_topics: 2 }) }))}
-                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-60"
+                  className="rounded-lg bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-60"
                 >
                   {busy === "run" ? "Running… (up to a minute)" : "Run the loop now"}
                 </button>

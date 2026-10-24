@@ -122,7 +122,7 @@ function useDebounced(fn: () => void, deps: unknown[], ms = 350) {
 
 function Card({ title, children, right }: { title: string; children: React.ReactNode; right?: React.ReactNode }) {
   return (
-    <section className="space-y-4 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+    <section className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-semibold">{title}</h2>
         {right}
@@ -485,7 +485,7 @@ function RoiPanel({ courseId, detail }: { courseId: string; detail: Detail }) {
             <p className="text-[11px] text-gray-500">Savings minus total cost and all loan interest. It crosses zero at payback.</p>
           </div>
 
-          <div className="overflow-hidden rounded-lg border border-gray-200 text-sm dark:border-gray-800">
+          <div className="overflow-hidden rounded-lg border border-gray-200 text-sm">
             <table className="w-full">
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
                 {[

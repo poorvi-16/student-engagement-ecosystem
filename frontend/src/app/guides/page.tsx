@@ -26,8 +26,9 @@ export default async function GuidesPage() {
         <ul className="grid gap-4 sm:grid-cols-2">
           {guides.map((g) => (
             <li key={g.slug}>
-              <Link href={`/guides/${g.slug}`} className="block h-full rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 dark:border-gray-800">
-                <h2 className="font-semibold">{g.title}</h2>
+              <Link href={`/guides/${g.slug}`} className="lift block h-full rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
+                <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">{g.aspect.label}</span>
+                <h2 className="mt-2 font-semibold">{g.title}</h2>
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">{g.summary}</p>
                 <p className="mt-2 text-xs capitalize text-gray-500">{g.tags.map(tagLabel).join(" · ")}</p>
               </Link>

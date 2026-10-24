@@ -45,7 +45,7 @@ export function MyData() {
   }
 
   return (
-    <section className="space-y-2 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+    <section className="space-y-2 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
       <h2 className="font-semibold">Your data</h2>
       <p className="text-sm text-gray-600 dark:text-gray-400">
         You control what we hold about you. See the{" "}

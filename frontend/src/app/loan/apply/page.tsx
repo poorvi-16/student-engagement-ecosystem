@@ -90,7 +90,7 @@ function Tracker({ app }: { app: App }) {
   const d = t.decision;
   return (
     <div className="space-y-5">
-      <section className="space-y-3 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+      <section className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-semibold">Application status</h2>
           <span className="rounded-full bg-gray-100 px-3 py-1 text-xs dark:bg-gray-900">Ref {t.reference}</span>
@@ -161,7 +161,7 @@ function Tracker({ app }: { app: App }) {
               ["You", app.cibil.student],
             ] as const
           ).map(([who, b]) => (
-            <div key={who} className="rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+            <div key={who} className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
               <p className="text-xs uppercase tracking-wide text-gray-500">{who} · mock bureau</p>
               <p className="text-2xl font-bold">{b.score ?? "NH"}</p>
               <p className="text-sm">{b.band}</p>
@@ -347,7 +347,7 @@ export default function ApplyPage() {
               ))}
             </nav>
 
-            <section className="space-y-4 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+            <section className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
               {current === "Loan" && (
                 <div className="space-y-3 text-sm">
                   <p>
@@ -369,7 +369,7 @@ export default function ApplyPage() {
                   {app.checklist.map((item) => {
                     const doc = [...app.documents].reverse().find((d) => d.doc_type === item.doc_type);
                     return (
-                      <li key={item.doc_type} className="space-y-1.5 rounded-lg border border-gray-200 p-3 dark:border-gray-800">
+                      <li key={item.doc_type} className="space-y-1.5 rounded-lg border border-gray-200 p-3">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <p className="text-sm font-medium">
                             {doc ? "✅" : item.required ? "⬜" : "▫️"} {item.label}
@@ -450,7 +450,7 @@ export default function ApplyPage() {
                 </div>
               )}
 
-              <div className="flex justify-between border-t border-gray-100 pt-3 dark:border-gray-800">
+              <div className="flex justify-between border-t border-gray-100 pt-3">
                 <button onClick={() => save(Math.max(0, step - 1))} disabled={step === 0 || busy} className="text-sm text-gray-500 disabled:opacity-40">
                   ← Back
                 </button>
@@ -476,7 +476,7 @@ export default function ApplyPage() {
               </ul>
               {app.missing.length > 0 && <p className="text-xs opacity-80">{app.missing.length} item(s) left before you can submit.</p>}
             </section>
-            <section className="space-y-1 rounded-xl border border-gray-200 p-4 text-sm dark:border-gray-800">
+            <section className="space-y-1 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 text-sm">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Indicative offer with these details</p>
               {app.offer.eligible ? (
                 <>

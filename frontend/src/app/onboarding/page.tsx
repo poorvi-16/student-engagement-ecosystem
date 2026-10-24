@@ -241,7 +241,7 @@ export default function OnboardingPage() {
             How ready your profile is for {f.target_countries.join(", ")}. Every tip you act on raises it.
           </p>
         </div>
-        <section className="rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+        <section className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
           <ProfileStrength strength={result.strength} />
         </section>
         <Link href="/dashboard" className="block rounded-lg bg-indigo-600 px-4 py-2.5 text-center font-medium text-white hover:bg-indigo-700">
@@ -542,7 +542,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={() => setStep((s) => s + 1)}
             disabled={!stepValid}
-            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
           >
             Next
           </button>
@@ -551,7 +551,7 @@ export default function OnboardingPage() {
             type="button"
             onClick={submit}
             disabled={!stepValid || busy}
-            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
           >
             {busy ? "Calculating…" : "See my Profile Strength"}
           </button>

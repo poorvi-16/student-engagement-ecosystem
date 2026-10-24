@@ -16,8 +16,10 @@ KINDS = {"guide", "reel", "linkedin"}
 
 
 def _card(p: ContentPost, why: str | None = None) -> dict:
+    aid, label = feed.aspect(p.tags)
     return {"slug": p.slug, "kind": p.kind, "title": p.title, "summary": p.summary, "tags": p.tags, "views": p.views,
-            "created_at": p.created_at, "why": why, "body": p.body if p.kind != "guide" else None}
+            "created_at": p.created_at, "why": why, "body": p.body if p.kind != "guide" else None,
+            "aspect": {"id": aid, "label": label}, "sources": p.sources or []}
 
 
 @router.get("/content")
@@ -36,9 +38,10 @@ def discover_feed(limit: int = Query(20, ge=1, le=50), user: User = Depends(curr
     rows = session.exec(select(ContentPost).where(ContentPost.status == "published")
                         .order_by(col(ContentPost.created_at).desc()).limit(200)).all()
     by_id = {r.id: r for r in rows}
-    items = [feed.Item(r.id, r.kind, tuple(r.tags or []), r.views, r.created_at) for r in rows]
+    items = [feed.Item(r.id, r.kind, tuple(r.tags or []), r.views, r.created_at, r.topic) for r in rows]
     ranked = feed.rank(items, (p.interest_tags if p else []) or [], (p.journey_stage if p else "explorer"), limit)
-    return {"posts": [_card(by_id[i.id], why) for i, why in ranked], "interests": (p.interest_tags if p else []) or []}
+    return {"posts": [_card(by_id[i.id], why) for i, why in ranked], "interests": (p.interest_tags if p else []) or [],
+            "aspects": [{"id": a, "label": label} for a, label, _ in feed.ASPECTS] + [{"id": "countries", "label": "Countries"}]}
 
 
 @router.get("/content/{slug}")
@@ -58,4 +61,4 @@ def get_post(slug: str, count: bool = True, user: User | None = Depends(optional
                            .order_by(col(ContentPost.created_at).desc()).limit(40)).all()
     mine = set(post.tags or [])
     related = sorted(related, key=lambda r: -len(mine & set(r.tags or [])))[:3]
-    return {**_card(post), "body": post.body, "sources": post.sources, "ai": post.ai, "related": [_card(r) for r in related]}
+    return {**_card(post), "body": post.body, "ai": post.ai, "related": [_card(r) for r in related]}

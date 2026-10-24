@@ -54,6 +54,7 @@ class Chunk:
     text: str
     url: str  # first source URL
     reviewed: str
+    urls: tuple[str, ...] = ()  # every source URL of the guide
 
 
 def _parse_doc(path: Path) -> list[Chunk]:
@@ -66,11 +67,12 @@ def _parse_doc(path: Path) -> list[Chunk]:
             meta[k.strip()] = v.strip()
         raw = raw[m.end():]
     title = meta.get("title", path.stem)
-    url = meta.get("sources", "").split("|")[0].strip()
+    urls = tuple(u.strip() for u in meta.get("sources", "").split("|") if u.strip())
+    url = urls[0] if urls else ""
     chunks = []
     for n, part in enumerate(re.split(r"^## ", raw, flags=re.M)[1:]):
         section, _, body = part.partition("\n")
-        chunks.append(Chunk(f"{path.stem}#{n}", path.stem, title, section.strip(), body.strip(), url, meta.get("reviewed", "")))
+        chunks.append(Chunk(f"{path.stem}#{n}", path.stem, title, section.strip(), body.strip(), url, meta.get("reviewed", ""), urls))
     return chunks
 
 

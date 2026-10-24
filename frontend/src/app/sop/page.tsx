@@ -58,7 +58,7 @@ function Result({ r }: { r: Full }) {
   const [copied, setCopied] = useState(false);
   const rv = r.review;
   return (
-    <section className="space-y-5 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+    <section className="space-y-5 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
       <div className="flex flex-wrap items-center gap-4">
         <ScoreRing score={r.score} />
         <div className="min-w-0 flex-1 space-y-1">
@@ -225,7 +225,7 @@ export default function SopPage() {
         </p>
       </header>
 
-      <section className="space-y-3 rounded-xl border border-gray-200 p-4 sm:p-5 dark:border-gray-800">
+      <section className="space-y-3 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
         <label className="block space-y-1 text-sm">
           <span className="font-medium">Reviewing for</span>
           <select
@@ -265,7 +265,7 @@ export default function SopPage() {
           <button
             onClick={submit}
             disabled={busy || text.trim().length < MIN_CHARS}
-            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+            className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 disabled:opacity-50"
           >
             {busy ? "Reviewing…" : "Review my SOP · +40 XP"}
           </button>
@@ -278,7 +278,7 @@ export default function SopPage() {
       {history.length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Past reviews</h2>
-          <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 text-sm dark:divide-gray-800 dark:border-gray-800">
+          <ul className="divide-y divide-gray-100 rounded-2xl border border-[var(--line)] bg-[var(--surface)] text-sm dark:divide-gray-800">
             {history.map((h) => (
               <li key={h.id}>
                 <button onClick={() => openPast(h.id)} className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left hover:bg-gray-50 dark:hover:bg-gray-900">

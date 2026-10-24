@@ -18,7 +18,7 @@ def test_banks_and_rule_feedback():
     assert set(rules.BANKS) == set(rules.COUNTRIES)
     for qs in rules.BANKS.values():
         assert 5 <= len(qs) <= 7 and len({q.id for q in qs}) == len(qs)
-        assert any(q.id in ("funding", "blocked") for q in qs)  # every country probes funding
+        assert any(q.id in ("funding", "blocked", "funds") for q in qs)  # every country probes funding
     funding = rules.find_question("USA", "funding")
     assert rules.rule_evaluate(funding, "My uncle.")["rating"] <= 2
     assert rules.rule_evaluate(funding, GOOD)["rating"] >= 4
@@ -89,3 +89,16 @@ def test_ai_follow_ups_are_capped(client, monkeypatch):
     turns = r["interview"]["turns"]
     assert sum(1 for t in turns if t.get("follow_up_of")) == 2 and n == 8
     assert r["interview"]["ai"] is True
+
+
+def test_all_catalog_countries_with_a_visa_have_a_bank_and_programs(client):
+    h = _headers(client)
+    ov = client.get("/visa", headers=h).json()
+    ids = {c["id"] for c in ov["countries"]}
+    assert {"Ireland", "Netherlands"} <= ids
+    for country in ids:
+        progs = [p for p in ov["programs"] if p["country"] == country]
+        assert progs, country  # every country offers programs to pick from, suggested ones included
+        assert all(p["source"] in ("shortlist", "suggested") for p in progs)
+    iv = client.post("/visa/start", json={"country": "Netherlands"}, headers=h).json()
+    assert iv["progress"]["total"] == 6

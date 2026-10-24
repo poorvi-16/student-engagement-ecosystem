@@ -21,12 +21,11 @@ export default function DashboardPage() {
 
   return (
     <main className="mx-auto max-w-3xl space-y-6 p-4 sm:p-8">
-      <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">PathPilot</h1>
-        <button onClick={signOut} className="text-sm text-gray-600 hover:underline dark:text-gray-400">
+      <div className="flex justify-end">
+        <button onClick={signOut} className="text-sm text-gray-500 hover:text-indigo-600 hover:underline">
           Sign out
         </button>
-      </header>
+      </div>
 
       {error ? (
         <p className="rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950 dark:text-red-200">
@@ -35,24 +34,26 @@ export default function DashboardPage() {
       ) : (
         me && (
           <>
-            <section className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+            <section className="gradient-brand flex flex-wrap items-center justify-between gap-4 rounded-3xl p-6 text-white shadow-lg shadow-indigo-500/20 sm:p-8">
               <div>
-                <p className="text-lg">Welcome{me.user.full_name ? `, ${me.user.full_name}` : ""} 👋</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400">{me.user.email}</p>
+                <p className="text-2xl font-bold sm:text-3xl">Welcome{me.user.full_name ? `, ${me.user.full_name.split(" ")[0]}` : ""} 👋</p>
+                <p className="mt-1 text-indigo-100">
+                  {me.profile ? `Targeting ${me.profile.target_countries.join(", ")} · ${me.profile.target_intake}` : "Take the 2-minute quiz to unlock your plan."}
+                </p>
               </div>
               <dl className="flex gap-3 text-center">
-                <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
-                  <dt className="text-xs text-gray-500">XP</dt>
+                <div className="rounded-2xl bg-white/15 px-4 py-2 backdrop-blur">
+                  <dt className="text-xs text-indigo-100">XP</dt>
                   <dd className="text-xl font-semibold">{me.user.xp}</dd>
                 </div>
-                <div className="rounded-lg bg-gray-50 px-4 py-2 dark:bg-gray-900">
-                  <dt className="text-xs text-gray-500">Streak</dt>
+                <div className="rounded-2xl bg-white/15 px-4 py-2 backdrop-blur">
+                  <dt className="text-xs text-indigo-100">Streak</dt>
                   <dd className="text-xl font-semibold">{me.user.streak_days}🔥</dd>
                 </div>
                 {me.user.role === "admin" && (
-                  <Link href="/admin" className="rounded-lg bg-indigo-50 px-4 py-2 hover:bg-indigo-100 dark:bg-indigo-950/50">
-                    <dt className="text-xs text-gray-500">Admin</dt>
-                    <dd className="text-xl font-semibold text-indigo-700 dark:text-indigo-300">Console →</dd>
+                  <Link href="/admin" className="rounded-2xl bg-white px-4 py-2 text-indigo-700">
+                    <dt className="text-xs">Admin</dt>
+                    <dd className="text-xl font-semibold">Console →</dd>
                   </Link>
                 )}
               </dl>
@@ -61,7 +62,7 @@ export default function DashboardPage() {
             <GrowthPanel onXp={reload} />
 
             {me.profile && me.strength ? (
-              <section className="space-y-4 rounded-xl border border-gray-200 p-5 dark:border-gray-800">
+              <section className="space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5">
                 <div className="flex items-center justify-between">
                   <h2 className="font-semibold">Profile Strength</h2>
                   <Link href="/onboarding" className="text-sm text-indigo-600 hover:underline">
@@ -79,9 +80,9 @@ export default function DashboardPage() {
               <section className="grid gap-4 sm:grid-cols-2">
                 <Link
                   href="/navigator"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">🧭</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">🧭</span>
                   <h2 className="mt-2 font-semibold">Career Navigator</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     AI-matched universities split into Ambitious, Target and Safe — with costs, salaries and payback.
@@ -90,9 +91,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/mentor"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">🧑‍🏫</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">🧑‍🏫</span>
                   <h2 className="mt-2 font-semibold">AI Mentor</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Ask about visas, tests, deadlines, scholarships and loans — personalised answers with sources.
@@ -101,9 +102,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/navigator"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">🎯</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">🎯</span>
                   <h2 className="mt-2 font-semibold">Admit odds &amp; ROI</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Open any program for what-if sliders on your scores, total cost, EMI, payback and an India-vs-abroad comparison.
@@ -112,9 +113,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/timeline"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">🗓️</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">🗓️</span>
                   <h2 className="mt-2 font-semibold">Application timeline</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Your month-by-month plan: tests, SOP, LORs, deadlines, loan and visa — tick tasks off as you go.
@@ -123,9 +124,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/sop"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">✍️</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">✍️</span>
                   <h2 className="mt-2 font-semibold">SOP reviewer</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Paste your Statement of Purpose for a rubric score, the fixes that matter most and a stronger opening.
@@ -134,9 +135,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/visa"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5"
                 >
-                  <p className="text-2xl">🛂</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">🛂</span>
                   <h2 className="mt-2 font-semibold">Visa mock interview</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Practise with an AI visa officer (US, UK, Canada, Germany, Australia) and get coached after every answer.
@@ -145,9 +146,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/discover"
-                  className="rounded-xl border border-gray-200 p-5 transition hover:border-indigo-400 hover:shadow-sm sm:col-span-2 dark:border-gray-800"
+                  className="lift rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 sm:col-span-2"
                 >
-                  <p className="text-2xl">📚</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">📚</span>
                   <h2 className="mt-2 font-semibold">Discover</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Guides on visas, tests, costs and funding, picked for your interests and journey stage.
@@ -156,9 +157,9 @@ export default function DashboardPage() {
                 </Link>
                 <Link
                   href="/loan"
-                  className="rounded-xl border-2 border-indigo-200 bg-indigo-50/50 p-5 transition hover:border-indigo-400 hover:shadow-sm sm:col-span-2 dark:border-indigo-900 dark:bg-indigo-950/30"
+                  className="lift rounded-2xl border-2 border-indigo-200 bg-indigo-50/60 p-5 sm:col-span-2 dark:border-indigo-900 dark:bg-indigo-950/30"
                 >
-                  <p className="text-2xl">💰</p>
+                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/60">💰</span>
                   <h2 className="mt-2 font-semibold">Education loan planner</h2>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Soft eligibility check (no credit score impact), offers from simulated lenders, EMI &amp; moratorium planner with Section 80E savings.
@@ -174,7 +175,7 @@ export default function DashboardPage() {
                 </p>
                 <Link
                   href="/onboarding"
-                  className="mt-4 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+                  className="mt-4 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white shadow-sm hover:bg-indigo-700"
                 >
                   Start the quiz · +100 XP
                 </Link>

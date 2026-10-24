@@ -10,12 +10,33 @@ from datetime import datetime, timezone
 
 # Topics that help most at each journey stage
 STAGE_TOPICS = {
-    "explorer": {"topic:tests", "topic:funding"},
-    "shortlister": {"topic:timeline", "topic:tests", "topic:funding"},
-    "applicant": {"topic:sop", "topic:timeline", "topic:visa"},
-    "admitted": {"topic:visa", "topic:funding"},
-    "funding": {"topic:funding", "topic:visa"},
+    "explorer": {"topic:planning", "topic:tests", "topic:funding", "topic:applications"},
+    "shortlister": {"topic:timeline", "topic:planning", "topic:tests", "topic:funding"},
+    "applicant": {"topic:sop", "topic:applications", "topic:timeline", "topic:visa"},
+    "admitted": {"topic:visa", "topic:funding", "topic:predeparture", "topic:life", "topic:careers"},
+    "funding": {"topic:funding", "topic:forex", "topic:visa", "topic:predeparture"},
 }
+
+# The different sides of the journey the Discover page lets students browse, in priority order
+ASPECTS = [
+    ("visa", "Visas & immigration", {"topic:visa"}),
+    ("careers", "Careers & work", {"topic:careers"}),
+    ("apply", "Tests & applications", {"topic:tests", "topic:sop", "topic:applications"}),
+    ("money", "Money & loans", {"topic:funding", "topic:loan", "topic:forex"}),
+    ("life", "Life abroad", {"topic:life", "topic:predeparture"}),
+    ("plan", "Planning", {"topic:planning", "topic:timeline"}),
+]
+
+
+def aspect(tags) -> tuple[str, str]:
+    """(id, label) of the part of the journey a post is about; country-only posts are 'Countries'."""
+    have = set(tags or [])
+    for aid, label, topics in ASPECTS:
+        if have & topics:
+            return aid, label
+    return "countries", "Countries"
+
+
 KIND_BONUS = {"guide": 0.6, "reel": 0.2, "linkedin": 0.0}  # long guides first; short formats fill the feed
 
 
@@ -26,6 +47,7 @@ class Item:
     tags: tuple[str, ...]
     views: int
     created_at: datetime
+    topic: str = ""
 
 
 def _label(tag: str) -> str:
@@ -51,7 +73,23 @@ def score(item: Item, interests: list[str], stage: str, now: datetime | None = N
     return pts, why
 
 
+TOPIC_REPEAT_PENALTY = 1.6  # each earlier pick on the same topic lowers the next one, so the feed shows different sides
+ASPECT_REPEAT_PENALTY = 0.6
+
+
 def rank(items: list[Item], interests: list[str], stage: str, limit: int = 20, now: datetime | None = None) -> list[tuple[Item, str]]:
-    scored = [(score(i, interests, stage, now), i) for i in items]
-    scored.sort(key=lambda x: (-x[0][0], -x[1].id))
-    return [(i, why) for (_, why), i in scored[:limit]]
+    """Best-first, but each pick lowers the score of posts on the same topic or aspect so the top of the feed is varied."""
+    pool = [(score(i, interests, stage, now), i) for i in items]
+    pool.sort(key=lambda x: (-x[0][0], -x[1].id))
+    out: list[tuple[Item, str]] = []
+    topics: dict[str, int] = {}
+    aspects: dict[str, int] = {}
+    while pool and len(out) < limit:
+        best = max(range(len(pool)), key=lambda k: (pool[k][0][0] - TOPIC_REPEAT_PENALTY * topics.get(pool[k][1].topic, 0)
+                                                    - ASPECT_REPEAT_PENALTY * aspects.get(aspect(pool[k][1].tags)[0], 0), -k))
+        (_, why), item = pool.pop(best)
+        topics[item.topic] = topics.get(item.topic, 0) + 1
+        aid = aspect(item.tags)[0]
+        aspects[aid] = aspects.get(aid, 0) + 1
+        out.append((item, why))
+    return out

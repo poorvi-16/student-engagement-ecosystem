@@ -9,6 +9,8 @@ COUNTRIES = {
     "Canada": "Canada study permit (SDS) officer questions",
     "Germany": "German national student visa interview",
     "Australia": "Australian Student visa (Genuine Student) interview",
+    "Ireland": "Irish study visa and immigration officer questions",
+    "Netherlands": "Dutch student residence permit (MVV) questions",
 }
 
 
@@ -90,6 +92,33 @@ BANKS: dict[str, list[Question]] = {
         Question("circumstances", "Tell me about your current situation: studies, work and family in India.",
                  "Ties to India and a coherent personal situation (Genuine Student requirement).", ("family", "parents", "work", "job", "studied", "india")),
         COMMON_FUNDING, SPONSOR, RETURN,
+    ],
+    # Ireland and the Netherlands rarely hold a visa interview; these are the questions officers and universities ask,
+    # which is also what a border officer on arrival may ask.
+    "Ireland": [
+        Question("why_ireland", "Why have you chosen to study in Ireland, and why this course?",
+                 "Specific reasons tied to the programme and career plan, not only work rights.", ("course", "programme", "program", "industry", "research", "module")),
+        Question("background", "Tell me about your education and work history so far.",
+                 "A consistent history that leads to this course; gaps explained.", ("degree", "bachelor", "cgpa", "worked", "internship", "project")),
+        COMMON_FUNDING,
+        Question("accommodation", "Where will you live in Ireland and what will it cost per month?",
+                 "A realistic housing plan and monthly budget (Dublin and Cork are expensive).", ("accommodation", "rent", "euro", "€", "month", "campus", "shared")),
+        Question("work", "Do you plan to work while studying, and how will you balance it with your course?",
+                 "Knows the part-time work limits and that work is not the main funding source.", ("part-time", "hours", "limit", "study", "week", "not rely")),
+        RETURN,
+    ],
+    "Netherlands": [
+        Question("why_nl", "Why do you want to study in the Netherlands and at this university?",
+                 "Programme-specific reasons (courses, research, teaching style), not only cost.", ("programme", "program", "course", "research", "university", "teaching")),
+        Question("background", "How does this master's relate to your bachelor's degree and experience?",
+                 "A logical progression and meeting the admission requirements.", ("degree", "bachelor", "project", "experience", "worked", "field")),
+        Question("funds", "How will you cover tuition and living costs? Do you have proof of the required funds?",
+                 "Clear plan with documents (savings, sponsor, loan, scholarship) matching the required monthly amount.", ("loan", "sponsor", "savings", "euro", "€", "scholarship", "parents", "proof")),
+        Question("housing", "Have you arranged housing? The Netherlands has a shortage, so what is your plan?",
+                 "Awareness of the housing shortage and a concrete plan (university housing, agencies, temporary stay).", ("housing", "accommodation", "university", "room", "rent", "agency", "temporary")),
+        Question("dutch", "Do you speak any Dutch, and how will you handle daily life?",
+                 "Honest level; English-taught programmes are fine but a willingness to learn helps.", ("english", "dutch", "learn", "course", "language")),
+        RETURN,
     ],
 }
 
