@@ -58,7 +58,7 @@ backend/
     mocks/               cibil.py, nbfc_los.py, notifications.py
     db/                  models.py (all tables), session.py
   data/                  universities.csv, courses.csv, catalog_meta.json, loan_products.json,
-                         generate_catalog.py, kb/*.md (22 curated guides)
+                         generate_catalog.py, kb/*.md (23 curated guides)
   migrations/versions/   Alembic migrations
   tests/                 pytest suite (132 tests)
   scripts/live_e2e.py    live end-to-end isolation check (creates and deletes 3 throwaway accounts)
